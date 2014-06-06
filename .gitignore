@@ -1,0 +1,15 @@
+# Compiled files
+*.pyc
+
+# Fits files used as examples
+*.fits
+
+# Temporary files
+*.save
+*~
+
+# Compressed files
+*.tar
+*.tar.gz
+*.zip
+*.tar.bz2
