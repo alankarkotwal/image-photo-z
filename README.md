@@ -7,6 +7,13 @@ _Pixel-level estimation of photometric redshifts for astronomical images._
 ####Requirements:
 * A computer running a Debian-like operating system, preferably Ubuntu 12.04 or higher.
 * Python support and administrator access
+* Software dependencies:
+  * Python 2.7 or higher (installed with the python-dev package)
+  * Numpy
+  * Astropy
+  * libcfitsio
+  * Montage Image Mosaic Software for Astronomers
+  * montage_wrapper package for Python
 
 ####Install Instructions:  
 The setup-* scripts take care of the installation of the package.  
