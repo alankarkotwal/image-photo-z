@@ -14,6 +14,7 @@ sudo apt-get -qy install python-pip
 # Install necessary python packages using pip
 sudo pip install numpy
 sudo pip install astropy
+sudo pip install pysex
 
 # Install libcfitsio
 sudo apt-get install libcfitsio*
