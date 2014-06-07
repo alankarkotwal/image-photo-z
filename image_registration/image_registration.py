@@ -20,7 +20,7 @@ def register_reproject(direc):
 	bands=glob.glob(direc+"/*.fits")
 	for image in bands:
 		cmds.mProject(image, image+"_reg", direc+"/header.hdr")
- 
+
 
 '''# Register using WCS only
 def register_wcs(image, ref, out):
