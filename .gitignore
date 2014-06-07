@@ -2,7 +2,7 @@
 *.pyc
 
 # Fits files used as examples
-*.fits
+*.fits*
 
 # Temporary files
 *.save
