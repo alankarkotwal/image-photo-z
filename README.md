@@ -30,12 +30,8 @@ Install the package by running
 
 ####Instructions For Use:  
 * **image_registration module**: This contains _image-registration.py_ which contains most function definitions.  
-  The general structure of a registration function is **register_<method-name>(image, ref, out).**  
-  The _image_ is the input, the _ref_ is the reference image and the _out_ is the output image name.
   * **register_reproject(dirname)** uses the reproject function in the IPAC Montage toolkit to align images. Dirname is the name of the directory that the images are stored in. Output images are put into the same directory.
-  * **register_wcs** uses astrometric information in FITS headers to align images.
-  * **register_sex** plans to register using SExtractor and catalog information.
-  * **reg_check_diff** outputs a difference image to check the registration.
+  * **reg_check_diff(image, ref, out)** outputs a difference image to check the registration. The _image_ is the input, the _ref_ is the reference image and the _out_ is the output image name.
   The _main.py_ file here has an application example.
 
 ####Miscellaneous Notes:  
