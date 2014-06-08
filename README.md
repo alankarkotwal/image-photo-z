@@ -31,7 +31,7 @@ Install the package by running
 ####Instructions For Use:  
 * **image_registration module**: This contains _image-registration.py_ which contains most function definitions.  
   * **register_reproject(dirname)** uses the reproject function in the IPAC Montage toolkit to align images. Dirname is the name of the directory that the images are stored in. Output images are put into the same directory.
-  * **reg_check_diff(image, ref, out)** outputs a difference image to check the registration. The _image_ is the input, the _ref_ is the reference image and the _out_ is the output image name.
+  * **reg_check_diff(image, ref, out)** outputs a difference image to check the registration. The _image_ is the input, the _ref_ is the reference image and the _out_ is the output image name.  
   The _main.py_ file here has an application example.
 
 ####Miscellaneous Notes:  
