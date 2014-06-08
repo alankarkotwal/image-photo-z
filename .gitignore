@@ -1,8 +1,10 @@
 # Compiled files
 *.pyc
 
-# Fits files used as examples
+# Fits files used as examples and Montage files
 *.fits*
+*.hdr
+*.tbl
 
 # Temporary files
 *.save
@@ -13,3 +15,8 @@
 *.tar.gz
 *.zip
 *.tar.bz2
+
+# Sextractor files
+*.sex
+*.param
+*.conv
