@@ -6,6 +6,7 @@ from montage_wrapper import commands as cmds
 from montage_wrapper import wrappers as wrps
 import os
 
+
 # Get image lists compatible with Montage. For the 'obj' parameter always use quotes.
 def get_image_lists(obj, width, height, out, survey="SDSS"):
 	try:
@@ -17,7 +18,8 @@ def get_image_lists(obj, width, height, out, survey="SDSS"):
 		else:
 			return -1
 	for band in ['u','g','r','i','z']:
-		mArchiveList(survey, band, obj, width, height, obj+"/"+band+"_images.tbl")
+		cmds.mArchiveList(survey, band, obj, width, height, obj+"/"+band+"_images.tbl")
+
 
 # Parse the image lists
 def parse_image_lists(obj):
@@ -44,11 +46,28 @@ def parse_image_lists(obj):
 		out=open(obj+"/"+band+"_urls.tbl","w")
 		i=i+1
 		while i<len(lines):
-			print lines[i][nChars:nCharsMax]
+			out.write(lines[i][nChars:nCharsMax]+'\n')
 			i=i+1
 		out.close()
 		table.close()
 
+
 # Download images from server
-def get_images(obj):
+def download_images(obj):
+	for band in ['u','g','r','i','z']:
+		try:
+			url_file=open(obj+"/"+band+"_urls.tbl","r")
+		except IOError:
+			print "Did you extract URLs using parse_image_lists first?"
+			return -1
+		urls=url_file.readlines()
+		for i in range(len(urls)):
+			print "Downloading "+urls[i]
+			cmds.mArchiveGet(urls[i], obj+"/"+band+str(i)+".fits")
+		url_file.close()
+		os.system("rm -rf "+obj+"/*.tbl ")
+
+
+# Do all this together
+def get_images():
 	pass
