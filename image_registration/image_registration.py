@@ -4,6 +4,7 @@
 
 import numpy as np
 from astropy.io import fits
+import montage_wrapper
 from montage_wrapper import commands as cmds
 from montage_wrapper import  wrappers as wrps
 import glob
@@ -19,7 +20,8 @@ def register_reproject(direc):
 	cmds.mMakeHdr(direc+"/images.tbl", direc+"/header.hdr")
 	bands=glob.glob(direc+"/*.fits")
 	for image in bands:
-		cmds.mProject(image, image+"_reg", direc+"/header.hdr")
+		#cmds.mProject(image, image+"_reg", direc+"/header.hdr")
+		montage_wrapper.reproject(image, image+"_reg", direc+"/header.hdr")
 
 
 '''# Register using WCS only
