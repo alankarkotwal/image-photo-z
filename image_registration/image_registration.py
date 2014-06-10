@@ -4,24 +4,21 @@
 
 import numpy as np
 from astropy.io import fits
-import montage_wrapper
+import montage_wrapper as mw
 from montage_wrapper import commands as cmds
-from montage_wrapper import  wrappers as wrps
 import glob
 import os
 #from image_registration import chi2_shifts as c2s
 #import pysex as ps
 
 
-# Calculate the registration using Montage reproject, doesn't work as of now.
-def register_reproject(direc):
-	os.system("rm -rf "+direc+"/header.hdr "+direc+"/images.tbl "+direc+"/*_area* "+direc+"/*_diff* "+direc+"/*_reg*")
-	cmds.mImgtbl(direc, direc+"/images.tbl")
-	cmds.mMakeHdr(direc+"/images.tbl", direc+"/header.hdr")
-	bands=glob.glob(direc+"/*.fits")
-	for image in bands:
-		#cmds.mProject(image, image+"_reg", direc+"/header.hdr")
-		montage_wrapper.reproject(image, image+"_reg", direc+"/header.hdr")
+# Calculate the registration using Montage reproject.
+def register_reproject(direc, ref='r'):
+	os.system("rm -rf "+direc+"/"+ref+"_header.hdr "+direc+"/*_area* "+direc+"/*_reg*")
+	cmds.mGetHdr(direc+"/"+ref+".fits",direc+"/header_"+ref+".hdr")
+	list_in=[direc+'/g.fits',direc+'/r.fits',direc+'/i.fits',direc+'/u.fits',direc+'/z.fits']
+	list_out=[direc+'/g_reg.fits',direc+'/r_reg.fits',direc+'/i_reg.fits',direc+'/u_reg.fits',direc+'/z_reg.fits']
+	mw.reproject(list_in,list_out,header="header_"+ref+".hdr",north_aligned=True,system='EQUJ',exact_size=True,common=True)
 
 
 '''# Register using WCS only
