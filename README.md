@@ -3,6 +3,7 @@ Image Photo-Z
 
 _Pixel-level estimation of photometric redshifts for astronomical images._
 
+This is a bit out of date and will be updated as soon as possible.
 
 ####Requirements:
 * A computer running a Debian-like operating system, preferably Ubuntu 12.04 or higher.
