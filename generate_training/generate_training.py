@@ -281,7 +281,6 @@ def generate_training_background(segImageNames, imageFileNames):
 				for k in fitsImages:
 					if math.isnan(k[i][j]):
 						isPixelValid=0
-						print k[i][j]
 				if isPixelValid==1:
 					trainingVector=[]
 					for k in fitsImages:
