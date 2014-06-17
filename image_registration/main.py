@@ -8,7 +8,7 @@ reg_images=glob.glob(direc+"/*.fits")
 
 ref='g0'
 
-#register_reproject(direc)
+register_reproject(direc)
 
-for image in reg_images:
-	reg_check_diff(image, direc+"/"+ref+".fits", image+"_diff")
+#for image in reg_images:
+#	reg_check_diff(image, direc+"/"+ref+".fits", image+"_diff")
