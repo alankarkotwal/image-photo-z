@@ -84,12 +84,14 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 				if catalog[int(i.split()[0])].split(',')[6] == catagory:
 					redshift=float(catalog[int(i.split()[0])].split(',')[4])
 					redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
+					pixelRA=float(catalog[int(i.split()[0])].split(',')[2])
+					pixelDec=float(catalog[int(i.split()[0])].split(',')[3])
 					if catagory=="GALAXY":
-						objClass=1
+						objClass=1.0
 					elif catagory=="STAR":
-						objClass=2
+						objClass=2.0
 					elif catagory=="QSO":
-						objClass=3
+						objClass=3.0
 					segImageList=fits.open(segImageName)
 					segImage=segImageList[0].data
 					thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
@@ -108,6 +110,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					trainingArray[0].append("Redshift")
 					trainingArray[0].append("RedshiftError")
 					trainingArray[0].append("Class")
+					trainingArray[0].append("PixelRA")
+					trainingArray[0].append("PixelDec")
 					for j in range(int(i.split()[3]), int(i.split()[4])+1):
 						for k in range(int(i.split()[5]), int(i.split()[6])+1):
 							if segImage[k][j]==thisObjFlag:
@@ -117,7 +121,10 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 								trainingVector.append(redshift)
 								trainingVector.append(redshiftError)
 								trainingVector.append(objClass)
+								trainingVector.append(pixelRA)
+								trainingVector.append(pixelDec)
 								trainingArray.append(trainingVector)
+								
 				
 					specObjID=catalog[int(i.split()[0])].split(',')[1]
 					
@@ -193,11 +200,6 @@ def generate_training_background(segImageNames, imageFileNames):
 				
 	trainingData=numpy.array(trainingArray)
 	numpy.savetxt("BACKGROUND/background.csv", trainingData, delimiter=" ")
-				
-	# trainingDataTable=Table(trainingData)
-				
-	#trainingTable=fits.BinTableHDU(data=Table(trainingArray))
-	#trainingTable.writeto(specObjID+".fits")
 
 
 # Example use follows
