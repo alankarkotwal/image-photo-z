@@ -64,181 +64,82 @@ def sextract(bands, ref):
 	os.system("cp "+ref+"_seg.fits ref.fits")
 
 
-def generate_training_galaxies(objectsFileName, segImageName, catalog, imageFileNames):
-	os.mkdir("galaxies")
+def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory):
+	if catagory not in ["GALAXY", "STAR", "QSO"]:
+		print "Argument catagory must be one of GAL, STR and QSO."
+		return -1
+	else:
+		os.mkdir(catagory)
 	
-	objectsFile=open(objectsFileName, "r")
-	objects=objectsFile.readlines()
+		objectsFile=open(objectsFileName, "r")
+		objects=objectsFile.readlines()
 	
-	catalogFile=open(catalog, "r")
-	catalog=catalogFile.readlines()
+		catalogFile=open(catalog, "r")
+		catalog=catalogFile.readlines()
 	
-	for i in objects:
-		if i[0] is '#' or None:
-			pass
-		else:
-			if catalog[int(i.split()[0])].split(',')[6] == "GALAXY":
-				redshift=float(catalog[int(i.split()[0])].split(',')[4])
-				redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
-				objClass=1.0
-				segImageList=fits.open(segImageName)
-				segImage=segImageList[0].data
-				thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
-				fitsFiles=[]
-				fitsImages=[]
-				k=0
-				for j in imageFileNames:
-					fitsFiles.append(fits.open(j))
-					fitsImages.append(fitsFiles[k][0].data)
-					k=k+1
-				trainingArray=[]
-				for j in range(int(i.split()[3]), int(i.split()[4])+1):
-					for k in range(int(i.split()[5]), int(i.split()[6])+1):
-						if segImage[k][j]==thisObjFlag:
-							trainingVector=[]
-							for l in fitsImages:
-								trainingVector.append(float(l[k][j]))
-							trainingVector.append(redshift)
-							trainingVector.append(redshiftError)
-							trainingVector.append(objClass)
-							trainingArray.append(trainingVector)
+		for i in objects:
+			if i[0] is '#' or None:
+				pass
+			else:
+				if catalog[int(i.split()[0])].split(',')[6] == catagory:
+					redshift=float(catalog[int(i.split()[0])].split(',')[4])
+					redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
+					if catagory=="GALAXY":
+						objClass=1
+					elif catagory=="STAR":
+						objClass=2
+					elif catagory=="QSO":
+						objClass=3
+					segImageList=fits.open(segImageName)
+					segImage=segImageList[0].data
+					thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
+					fitsFiles=[]
+					fitsImages=[]
+					k=0
+					trainingArray=[[]]
+					for j in imageFileNames:
+						fitsFiles.append(fits.open(j))
+						fitsImages.append(fitsFiles[k][0].data)
+						if j==imageFileNames[0]:
+							trainingArray[0].append("# "+j+"Magnitude")
+						else:
+							trainingArray[0].append(j+"Magnuitude")
+						k=k+1
+					trainingArray[0].append("Redshift")
+					trainingArray[0].append("RedshiftError")
+					trainingArray[0].append("Class")
+					for j in range(int(i.split()[3]), int(i.split()[4])+1):
+						for k in range(int(i.split()[5]), int(i.split()[6])+1):
+							if segImage[k][j]==thisObjFlag:
+								trainingVector=[]
+								for l in fitsImages:
+									trainingVector.append(float(l[k][j]))
+								trainingVector.append(redshift)
+								trainingVector.append(redshiftError)
+								trainingVector.append(objClass)
+								trainingArray.append(trainingVector)
 				
-				specObjID=catalog[int(i.split()[0])].split(',')[1]		
+					specObjID=catalog[int(i.split()[0])].split(',')[1]
+					
+					outfile=open(catagory+"/"+specObjID+".csv","w")
 				
-				trainingData=numpy.array(trainingArray)
-				numpy.savetxt("galaxies/"+specObjID+".csv", trainingData, delimiter=" ")
+					for entry in trainingArray:
+						for column in entry:
+							outfile.write(str(column)+" ")
+						outfile.write("\n")
+					
+					outfile.close()
 				
-				#trainingDataTable=Table(trainingData)
-				
-				#trainingTable=fits.BinTableHDU(data=Table(trainingArray))
-				#trainingTable.writeto(specObjID+".fits")
-				
-				segImageList.close()
-				for j in fitsFiles:
-					j.close()
+					segImageList.close()
+					for j in fitsFiles:
+						j.close()
 	
-	objectsFile.close()	
-	catalogFile.close()
-
-
-def generate_training_stars(objectsFileName, segImageName, catalog, imageFileNames):
-	os.mkdir("stars")
-	
-	objectsFile=open(objectsFileName, "r")
-	objects=objectsFile.readlines()
-	
-	catalogFile=open(catalog, "r")
-	catalog=catalogFile.readlines()
-	
-	for i in objects:
-		if i[0] is '#' or None:
-			pass
-		else:
-			if catalog[int(i.split()[0])].split(',')[6] == "STAR":
-				# redshift=float(catalog[int(i.split()[0])].split(',')[4])
-				# redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
-				redshift=0
-				redshiftError=0
-				objClass=2.0
-				segImageList=fits.open(segImageName)
-				segImage=segImageList[0].data
-				thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
-				fitsFiles=[]
-				fitsImages=[]
-				k=0
-				for j in imageFileNames:
-					fitsFiles.append(fits.open(j))
-					fitsImages.append(fitsFiles[k][0].data)
-					k=k+1
-				trainingArray=[]
-				for j in range(int(i.split()[3]), int(i.split()[4])+1):
-					for k in range(int(i.split()[5]), int(i.split()[6])+1):
-						if segImage[k][j]==thisObjFlag:
-							trainingVector=[]
-							for l in fitsImages:
-								trainingVector.append(float(l[k][j]))
-							trainingVector.append(redshift)
-							trainingVector.append(redshiftError)
-							trainingVector.append(objClass)
-							trainingArray.append(trainingVector)
-				
-				specObjID=catalog[int(i.split()[0])].split(',')[1]		
-				
-				trainingData=numpy.array(trainingArray)
-				numpy.savetxt("stars/"+specObjID+".csv", trainingData, delimiter=" ")
-				
-				#trainingDataTable=Table(trainingData)
-				
-				#trainingTable=fits.BinTableHDU(data=Table(trainingArray))
-				#trainingTable.writeto(specObjID+".fits")
-				
-				segImageList.close()
-				for j in fitsFiles:
-					j.close()
-	
-	objectsFile.close()	
-	catalogFile.close()
-
-
-def generate_training_qsos(objectsFileName, segImageName, catalog, imageFileNames):
-	os.mkdir("qsos")
-	
-	objectsFile=open(objectsFileName, "r")
-	objects=objectsFile.readlines()
-	
-	catalogFile=open(catalog, "r")
-	catalog=catalogFile.readlines()
-	
-	for i in objects:
-		if i[0] is '#' or None:
-			pass
-		else:
-			if catalog[int(i.split()[0])].split(',')[6] == "QSO":
-				redshift=float(catalog[int(i.split()[0])].split(',')[4])
-				redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
-				objClass=3.0
-				segImageList=fits.open(segImageName)
-				segImage=segImageList[0].data
-				thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
-				fitsFiles=[]
-				fitsImages=[]
-				k=0
-				for j in imageFileNames:
-					fitsFiles.append(fits.open(j))
-					fitsImages.append(fitsFiles[k][0].data)
-					k=k+1
-				trainingArray=[]
-				for j in range(int(i.split()[3]), int(i.split()[4])+1):
-					for k in range(int(i.split()[5]), int(i.split()[6])+1):
-						if segImage[k][j]==thisObjFlag:
-							trainingVector=[]
-							for l in fitsImages:
-								trainingVector.append(float(l[k][j]))
-							trainingVector.append(redshift)
-							trainingVector.append(redshiftError)
-							trainingVector.append(objClass)
-							trainingArray.append(trainingVector)
-				
-				specObjID=catalog[int(i.split()[0])].split(',')[1]		
-				
-				trainingData=numpy.array(trainingArray)
-				numpy.savetxt("qsos/"+specObjID+".csv", trainingData, delimiter=" ")
-				
-				#trainingDataTable=Table(trainingData)
-				
-				#trainingTable=fits.BinTableHDU(data=Table(trainingArray))
-				#trainingTable.writeto(specObjID+".fits")
-				
-				segImageList.close()
-				for j in fitsFiles:
-					j.close()
-	
-	objectsFile.close()	
-	catalogFile.close()
+		objectsFile.close()	
+		catalogFile.close()
 
 
 def generate_training_background(segImageNames, imageFileNames):
-	os.mkdir("background")
+	os.mkdir("BACKGROUND")
 	
 	redshift=-1.0
 	redshiftError=0.0
@@ -291,7 +192,7 @@ def generate_training_background(segImageNames, imageFileNames):
 					trainingArray.append(trainingVector)
 				
 	trainingData=numpy.array(trainingArray)
-	numpy.savetxt("background/background.csv", trainingData, delimiter=" ")
+	numpy.savetxt("BACKGROUND/background.csv", trainingData, delimiter=" ")
 				
 	# trainingDataTable=Table(trainingData)
 				
@@ -304,7 +205,7 @@ if __name__=="__main__":
 	preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
 	convert_catalog_to_exp_pixels("r.fits", "one_square_degree_processed.csv", "sky.list")
 	sextract(['u', 'g', 'r', 'i', 'z'], 'r')
-	generate_training_galaxies("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
-	generate_training_stars("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
-	generate_training_qsos("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
-	generate_training_background(["u_seg.fits", "g_seg.fits", "r_seg.fits", "i_seg.fits", "z_seg.fits"], ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
+	for catagory in ["GALAXY", "STAR", "QSO"]:
+		generate_training_objects("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"], catagory)
+	#generate_training_background(["u_seg.fits", "g_seg.fits", "r_seg.fits", "i_seg.fits", "z_seg.fits"], ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
+
