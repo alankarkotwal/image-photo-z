@@ -6,6 +6,7 @@ from astropy.io import fits
 import os
 from astropy.table import Table
 import math
+import urllib
 
 # A note on objClass: Since we store the data in BinTableHDU, we need an encoding scheme for objClass. Here, I have
 # 1: Galaxy
@@ -29,7 +30,42 @@ def preprocess_catalog(catalog, output):
 	
 	catalogFile.close()
 	outputFile.close()
-		
+
+def generate_download_list(catalog, bands, output, rerun="301"):
+	catalogFile=open(catalog, "r")
+	catalogLines=catalogFile.readlines()
+	
+	outputFile=open(output, "w")
+	
+	for i in catalogLines:
+		run=i.split(',')[7]
+		camcol=i.split(',')[8]
+		field=i.split(',')[9].rstrip()
+		outputFile.write("# "+run+","+camcol+","+field+"\n")
+		for band in bands:
+			outputFile.write("http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(6)+".fits.bz2\n")
+			
+	catalogFile.close()
+	outputFile.close()
+	
+def download_images(catalog, bands, rerun="301"):	
+	catalogFile=open(catalog, "r")
+	catalogLines=catalogFile.readlines()
+	
+	for i in catalogLines:
+		run=i.split(',')[7]
+		camcol=i.split(',')[8]
+		field=i.split(',')[9].rstrip()
+		try:
+			os.mkdir(run+"-"+camcol+"-"+field)
+			for band in bands:
+				downloadURL="http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2\n"
+				print "Downloading", downloadURL
+				urllib.urlretrieve(downloadURL, run+"-"+camcol+"-"+field+"/"+band+".fits.bz2")
+		except OSError:
+			pass
+	
+	catalogFile.close()
 
 def convert_catalog_to_exp_pixels(filename, catalog, expPixelsList):
 	hdulist = fits.open(filename)
@@ -205,9 +241,11 @@ def generate_training_background(segImageNames, imageFileNames):
 # Example use follows
 if __name__=="__main__":
 	preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
-	convert_catalog_to_exp_pixels("r.fits", "one_square_degree_processed.csv", "sky.list")
+	download_images("one_square_degree_processed.csv", ['u','g','r','i','z'])
+#	generate_download_list("one_square_degree_processed.csv", ['u','g','r','i','z'], "download.list")
+'''	convert_catalog_to_exp_pixels("r.fits", "one_square_degree_processed.csv", "sky.list")
 	sextract(['u', 'g', 'r', 'i', 'z'], 'r')
 	for catagory in ["GALAXY", "STAR", "QSO"]:
 		generate_training_objects("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"], catagory)
-	#generate_training_background(["u_seg.fits", "g_seg.fits", "r_seg.fits", "i_seg.fits", "z_seg.fits"], ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])
+	#generate_training_background(["u_seg.fits", "g_seg.fits", "r_seg.fits", "i_seg.fits", "z_seg.fits"], ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])'''
 
