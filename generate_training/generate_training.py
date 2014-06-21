@@ -163,8 +163,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					trainingArray[0].append("Class")
 					trainingArray[0].append("PixelRA")
 					trainingArray[0].append("PixelDec")
-					for j in range(int(i.split()[3]), int(i.split()[4])+1):
-						for k in range(int(i.split()[5]), int(i.split()[6])+1):
+					for j in range(int(i.split()[3]), min(int(i.split()[4])+1,segImage.shape[0])):
+						for k in range(int(i.split()[5]), min(int(i.split()[6])+1,segImage.shape[1])):
 							if segImage[k][j]==thisObjFlag:
 								trainingVector=[]
 								for l in fitsImages:
