@@ -50,7 +50,7 @@ def generate_download_list(catalog, output, bands=['u','g','r','i','z'], rerun="
 	outputFile.close()
 
 	
-def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','r','i','z'], rerun="301"):	
+def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','r','i','z'], rerun="301"):
 	catalogFile=open(catalog, "r")
 	catalogLines=catalogFile.readlines()
 	logfileFile=open(logfile,"w")
@@ -132,11 +132,11 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 			if i[0] is '#' or None:
 				pass
 			else:
-				if catalog[int(i.split()[0])].split(',')[6] == catagory:
-					redshift=float(catalog[int(i.split()[0])].split(',')[4])
-					redshiftError=float(catalog[int(i.split()[0])].split(',')[5])
-					pixelRA=float(catalog[int(i.split()[0])].split(',')[2])
-					pixelDec=float(catalog[int(i.split()[0])].split(',')[3])
+				if catalog[int(i.split()[0])-1].split(',')[6] == catagory:
+					redshift=float(catalog[int(i.split()[0])-1].split(',')[4])
+					redshiftError=float(catalog[int(i.split()[0])-1].split(',')[5])
+					pixelRA=float(catalog[int(i.split()[0])-1].split(',')[2])
+					pixelDec=float(catalog[int(i.split()[0])-1].split(',')[3])
 					if catagory=="GALAXY":
 						objClass=1.0
 					elif catagory=="STAR":

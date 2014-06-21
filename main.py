@@ -1,7 +1,14 @@
+import sys
+sys.path.insert(0, 'image_registration')
+sys.path.insert(0, 'generate_training')
+
 from image_registration import *
 from generate_training import *
 import montage_wrapper
 import os
+import time
+
+start=time.time()
 
 try:
 	os.mkdir("data")
@@ -9,19 +16,22 @@ try:
 	os.mkdir("data/STAR")
 	os.mkdir("data/QSO")
 	os.mkdir("data/BACKGROUND")
+	os.mkdir("images")
 except OSError:
 	pass
 
-logfile=open("logfile", "r")
-
-logfileLines=logfile.readlines()
-
 preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
+
+download_images("one_square_degree_processed.csv", "images", logfile="logfile")
+
+logfile=open("logfile", "r")
+logfileLines=logfile.readlines()
+logfile.close()
 
 for i in logfileLines:
 	iden=i.rstrip()
 	print iden
-	os.system("cp download/"+iden+"* processing/")
+	os.system("cp images/"+iden+"* processing/")
 	list_in=[]
 	images_list=[]
 	sex_image_list=[]
@@ -44,3 +54,4 @@ for i in logfileLines:
 	print "BACKGROUND"
 	generate_training_background(seg_image_list, images_list, "data")
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
+	print (time.time()-start)/60
