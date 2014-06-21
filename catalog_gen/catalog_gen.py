@@ -22,7 +22,7 @@ def query_area(outputCatalog, minRA, maxRA, minDec, maxDec):
 			  specAll.ObjID = phot.ObjID
 			  AND phot.CLEAN = 1
 			  AND spec.zWarning = 0		"""
-	# The 'class' keyword needs to be added here, sqlcl complains if it is added. Pending task.
+	# The 'class' keyword needs to be added here after redshiftError, sqlcl complains if it is added. Pending task.
 	queryText=queryTemp+"AND spec.ra>"+str(minRA)+" AND spec.ra<"+str(maxRA)+" AND spec.dec>"+str(minDec)+" AND spec.dec<"+str(maxDec)
 	queryResult=query(queryText).read()
 	catalogFile.write(queryResult)
