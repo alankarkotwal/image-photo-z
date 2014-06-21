@@ -1,14 +1,13 @@
 SELECT ALL
   spec.specObjID AS id,
-  spec.z AS redshift,
-  spec.zErr as redshiftError,
   spec.ra,
   spec.dec,
+  spec.z AS redshift,
+  spec.zErr as redshiftError,
   specAll.class,
   specAll.run,
   specAll.camcol,
   specAll.field
-INTO mydb.objects_with_redshifts
 FROM SpecObj AS spec
 JOIN SpecPhotoAll AS specAll
 ON spec.specObjID = specAll.specObjID,

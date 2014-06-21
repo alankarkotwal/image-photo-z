@@ -1,0 +1,16 @@
+Explanation for the main file:
+
+Assuming that the CAS is already queried and a database ,"one_square_degree.csv", is obtained from the CAS which is in the form
+	id,ra,dec,redshift,redshiftError,class,run,camcol,field
+The SQL query required can be found in catalog_gen/sql. First get mydb setup using QueryDR10.sql and then get the required fields using (and modifying according to the area requirements) GetArea.sql.
+I have already done this here.
+
+General preprocessing the catalog to make the further process a bit convenient needs:
+	preprocess_catalog(catalog, output)
+Input: "one_square_degree.csv", output: "one_square_degree_processed.csv".
+
+Once this is done, we need to download images from the SDSS bulkFields. For this, we have:
+	download_images(catalog, downloadFolder, logfile="logfile")
+In the present case, I use the "one_square_degree_processed.csv" generated earlier, downloading images into a folder "images" and creating a "logfile" to keep track of images and remove duplicates.
+
+Next, processing images. 

@@ -1,1 +1,1 @@
-rm -rf data/ one_square_degree_processed.csv images/ logfile processing/*.cat processing/*.fits processing/*.fits
+rm -rf data/ one_square_degree_processed.csv logfile processing/*.cat processing/*.fits processing/*.fits
