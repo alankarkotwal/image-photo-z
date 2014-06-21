@@ -20,3 +20,6 @@
 *.sex
 *.param
 *.conv
+
+*.csv
+logfile*
