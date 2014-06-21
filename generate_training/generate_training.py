@@ -4,7 +4,6 @@ import numpy
 from astropy import wcs
 from astropy.io import fits 
 import os
-from astropy.table import Table
 import math
 import urllib
 
@@ -13,6 +12,7 @@ import urllib
 # 2: Star
 # 3: QSO
 # 4: Background
+
 
 def preprocess_catalog(catalog, output):
 	catalogFile=open(catalog, "r")
@@ -31,7 +31,8 @@ def preprocess_catalog(catalog, output):
 	catalogFile.close()
 	outputFile.close()
 
-def generate_download_list(catalog, bands, output, rerun="301"):
+
+def generate_download_list(catalog, output, bands=['u','g','r','i','z'], rerun="301"):
 	catalogFile=open(catalog, "r")
 	catalogLines=catalogFile.readlines()
 	
@@ -41,31 +42,38 @@ def generate_download_list(catalog, bands, output, rerun="301"):
 		run=i.split(',')[7]
 		camcol=i.split(',')[8]
 		field=i.split(',')[9].rstrip()
-		outputFile.write("# "+run+","+camcol+","+field+"\n")
+		outputFile.write("# "+run+"-"+camcol+"-"+field+"\n")
 		for band in bands:
-			outputFile.write("http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(6)+".fits.bz2\n")
+			outputFile.write("http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2\n")
 			
 	catalogFile.close()
 	outputFile.close()
+
 	
-def download_images(catalog, bands, rerun="301"):	
+def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','r','i','z'], rerun="301"):	
 	catalogFile=open(catalog, "r")
 	catalogLines=catalogFile.readlines()
+	logfileFile=open(logfile,"w")
 	
 	for i in catalogLines:
 		run=i.split(',')[7]
 		camcol=i.split(',')[8]
 		field=i.split(',')[9].rstrip()
 		try:
-			os.mkdir(run+"-"+camcol+"-"+field)
 			for band in bands:
 				downloadURL="http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2\n"
-				print "Downloading", downloadURL
-				urllib.urlretrieve(downloadURL, run+"-"+camcol+"-"+field+"/"+band+".fits.bz2")
+				if not os.path.isfile(downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits"):
+					print "Downloading", downloadURL
+					if band==bands[0]:
+						logfileFile.write(run+"-"+camcol+"-"+field+"\n")
+					urllib.urlretrieve(downloadURL, downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits.bz2")
+					os.system("bunzip2 "+downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits.bz2")
 		except OSError:
 			pass
 	
 	catalogFile.close()
+	logfileFile.close()
+
 
 def convert_catalog_to_exp_pixels(filename, catalog, expPixelsList):
 	hdulist = fits.open(filename)
@@ -93,19 +101,26 @@ def convert_catalog_to_exp_pixels(filename, catalog, expPixelsList):
 	expPixelsFile.close()
 
 
-def sextract(bands, ref):
-	for band in bands:
-		os.system("sex -c "+band+".sex "+band+".fits")
-	os.system("cp "+ref+".cat ref.cat")
-	os.system("cp "+ref+"_seg.fits ref.fits")
+def sextract(imageFileNames, configFileNames, processDir, refBand='r', bands=['u', 'g', 'r', 'i', 'z']):
+	currDir=os.getcwd()
+	os.chdir(processDir)
+	for i in range(len(imageFileNames)):
+		os.system("sex -c "+configFileNames[i]+" "+imageFileNames[i])
+	os.system("cp "+refBand+".cat ref.cat")
+	os.system("cp "+refBand+"_seg.fits ref.fits")
+	os.chdir(currDir)
 
 
-def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory):
+def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir):
 	if catagory not in ["GALAXY", "STAR", "QSO"]:
 		print "Argument catagory must be one of GAL, STR and QSO."
 		return -1
 	else:
-		os.mkdir(catagory)
+		try:
+			os.mkdir(outdir)
+			os.mkdir(outdir+"/"+catagory)
+		except OSError:
+			pass
 	
 		objectsFile=open(objectsFileName, "r")
 		objects=objectsFile.readlines()
@@ -139,9 +154,9 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 						fitsFiles.append(fits.open(j))
 						fitsImages.append(fitsFiles[k][0].data)
 						if j==imageFileNames[0]:
-							trainingArray[0].append("# "+j+"Magnitude")
+							trainingArray[0].append("# "+j+"Flux")
 						else:
-							trainingArray[0].append(j+"Magnuitude")
+							trainingArray[0].append(j+"Flux")
 						k=k+1
 					trainingArray[0].append("Redshift")
 					trainingArray[0].append("RedshiftError")
@@ -164,7 +179,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 				
 					specObjID=catalog[int(i.split()[0])].split(',')[1]
 					
-					outfile=open(catagory+"/"+specObjID+".csv","w")
+					outfile=open(outdir+"/"+catagory+"/"+specObjID+".csv","w")
 				
 					for entry in trainingArray:
 						for column in entry:
@@ -181,8 +196,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 		catalogFile.close()
 
 
-def generate_training_background(segImageNames, imageFileNames):
-	os.mkdir("BACKGROUND")
+def generate_training_background(segImageNames, imageFileNames, outdir):
 	
 	redshift=-1.0
 	redshiftError=0.0
@@ -212,7 +226,19 @@ def generate_training_background(segImageNames, imageFileNames):
 	
 	xshape,yshape=fitsImages[0].shape
 	
-	trainingArray=[]
+	trainingArray=[[]]
+	for j in imageFileNames:
+		fitsFiles.append(fits.open(j))
+		fitsImages.append(fitsFiles[k][0].data)
+		if j==imageFileNames[0]:
+			trainingArray[0].append("# "+j+"Flux")
+		else:
+			trainingArray[0].append(j+"Flux")
+	trainingArray[0].append("Redshift")
+	trainingArray[0].append("RedshiftError")
+	trainingArray[0].append("Class")
+	trainingArray[0].append("PixelRA")
+	trainingArray[0].append("PixelDec")
 	
 	for i in range(xshape):
 		for j in range(yshape):
@@ -235,17 +261,30 @@ def generate_training_background(segImageNames, imageFileNames):
 					trainingArray.append(trainingVector)
 				
 	trainingData=numpy.array(trainingArray)
-	numpy.savetxt("BACKGROUND/background.csv", trainingData, delimiter=" ")
+	filename=imageFileNames[0].split('/')[len(imageFileNames[0].split('/'))-1]
+	
+	outfile=open(outdir+"/BACKGROUND/"+filename+".csv","w")
+	
+	for entry in trainingArray:
+		for column in entry:
+			outfile.write(str(column)+" ")
+		outfile.write("\n")
+	
+	outfile.close()
 
 
 # Example use follows
 if __name__=="__main__":
 	preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
-	download_images("one_square_degree_processed.csv", ['u','g','r','i','z'])
-#	generate_download_list("one_square_degree_processed.csv", ['u','g','r','i','z'], "download.list")
+	try:
+		os.mkdir("download")
+	except OSError:
+		pass
+	generate_download_list("one_square_degree_processed.csv", "download.list")
+	download_images("one_square_degree_processed.csv", "images")
 '''	convert_catalog_to_exp_pixels("r.fits", "one_square_degree_processed.csv", "sky.list")
 	sextract(['u', 'g', 'r', 'i', 'z'], 'r')
 	for catagory in ["GALAXY", "STAR", "QSO"]:
-		generate_training_objects("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"], catagory)
+		generate_training_objects("ref.cat", "ref.fits", "one_square_degree_processed.csv", ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"], catagory, "data")
 	#generate_training_background(["u_seg.fits", "g_seg.fits", "r_seg.fits", "i_seg.fits", "z_seg.fits"], ["u.fits", "g.fits", "r.fits", "i.fits", "z.fits"])'''
 

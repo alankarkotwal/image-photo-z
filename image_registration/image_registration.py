@@ -13,12 +13,16 @@ import os
 
 
 # Calculate the registration using Montage reproject.
-def register_reproject(direc, ref='r'):
+def register_reproject_direc(direc, ref='r'):
 	os.system("rm -rf "+direc+"/"+ref+"_header.hdr "+direc+"/*_area* "+direc+"/*_reg*")
 	cmds.mGetHdr(direc+"/"+ref+".fits",direc+"/header_"+ref+".hdr")
 	list_in=[direc+'/g.fits',direc+'/r.fits',direc+'/i.fits',direc+'/u.fits',direc+'/z.fits']
 	list_out=[direc+'/g_reg.fits',direc+'/r_reg.fits',direc+'/i_reg.fits',direc+'/u_reg.fits',direc+'/z_reg.fits']
 	mw.reproject(list_in,list_out,header=direc+"/header_"+ref+".hdr",north_aligned=True,system='EQUJ',exact_size=True,common=True)
+	
+def register_reproject(inputImages, outputImages, refImage, processDir, headerName="header.hdr"):
+	cmds.mGetHdr(refImage,headerName)
+	mw.reproject(inputImages,outputImages,header=headerName,north_aligned=True,system='EQUJ',exact_size=True,common=True)
 
 
 '''# Register using WCS only
