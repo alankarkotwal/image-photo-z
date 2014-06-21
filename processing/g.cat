@@ -1,9 +1,0 @@
-#   1 VECTOR_ASSOC           ASSOCiated parameter vector                               
-#   2 XPEAK_IMAGE            x-coordinate of the brightest pixel                        [pixel]
-#   3 YPEAK_IMAGE            y-coordinate of the brightest pixel                        [pixel]
-#   4 XMIN_IMAGE             Minimum x-coordinate among detected pixels                 [pixel]
-#   5 XMAX_IMAGE             Maximum x-coordinate among detected pixels                 [pixel]
-#   6 YMIN_IMAGE             Minimum y-coordinate among detected pixels                 [pixel]
-#   7 YMAX_IMAGE             Maximum y-coordinate among detected pixels                 [pixel]
-          51         20         35          1         42         16         99
-           8        148        137        133        211        113        173
