@@ -19,7 +19,7 @@ mkdir sextractor
 cd sextractor
 wget http://www.astromatic.net/download/sextractor/sextractor-2.19.5-1.x86_64.rpm
 sudo alien sextractor-2.19.5-1.x86_64.rpm
-sudo dpkg -i sextractor-2.19.5-1.x86_64.deb
+sudo dpkg -i sextractor_2.19.5-2_amd64.deb
 cd ..
 rm -rf sextractor/
 
