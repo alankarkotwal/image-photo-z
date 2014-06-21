@@ -179,7 +179,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 				
 					specObjID=catalog[int(i.split()[0])-1].split(',')[1]
 					
-					outfile=open(outdir+"/"+catagory+"/"+specObjID+".csv","w")
+					outfile=open(outdir+"/"+catagory+"/"+specObjID+"-"+str(time.time())+".csv","w")
 				
 					for entry in trainingArray:
 						for column in entry:
