@@ -34,15 +34,13 @@ for i in logfileLines:
 		sex_image_list.append(iden+"-"+band+"_reg.fits")
 		seg_image_list.append("processing/"+band+"_seg.fits")
 		sexConfigFiles.append(band+".sex")
-	try:
-		register_reproject(list_in, images_list, ref_image, "processing", headerName="processing/"+iden+".hdr")
-		convert_catalog_to_exp_pixels(ref_image, "one_square_degree_processed.csv", "processing/sky.list")
-		sextract(sex_image_list, sexConfigFiles, "processing/")
-		for catagory in ["GALAXY", "STAR", "QSO"]:
-			print catagory
-			generate_training_objects("processing/ref.cat", "processing/ref.fits", "one_square_degree_processed.csv", images_list, catagory, "data")
-		print "BACKGROUND"
-		generate_training_background(seg_image_list, images_list, "data")
-	except montage_wrapper.status.MontageError:
-		pass
+
+	register_reproject(list_in, images_list, ref_image, "processing", headerName="processing/"+iden+".hdr")
+	convert_catalog_to_exp_pixels(ref_image, "one_square_degree_processed.csv", "processing/sky.list")
+	sextract(sex_image_list, sexConfigFiles, "processing/")
+	for catagory in ["GALAXY", "STAR", "QSO"]:
+		print catagory
+		generate_training_objects("processing/ref.cat", "processing/ref.fits", "one_square_degree_processed.csv", images_list, catagory, "data")
+	print "BACKGROUND"
+	generate_training_background(seg_image_list, images_list, "data")
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
