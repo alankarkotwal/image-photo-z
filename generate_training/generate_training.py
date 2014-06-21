@@ -177,7 +177,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 								trainingArray.append(trainingVector)
 								
 				
-					specObjID=catalog[int(i.split()[0])].split(',')[1]
+					specObjID=catalog[int(i.split()[0])-1].split(',')[1]
 					
 					outfile=open(outdir+"/"+catagory+"/"+specObjID+".csv","w")
 				
