@@ -113,7 +113,7 @@ def sextract(imageFileNames, configFileNames, processDir, refBand='r', bands=['u
 
 def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir):
 	if catagory not in ["GALAXY", "STAR", "QSO"]:
-		print "Argument catagory must be one of GAL, STR and QSO."
+		print "Argument catagory must be one of GALAXY, STAR and QSO."
 		return -1
 	else:
 		try:
