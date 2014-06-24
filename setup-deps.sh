@@ -3,9 +3,12 @@
 # Get latest definitions and install packages
 sudo apt-get update
 sudo apt-get upgrade python
-sudo apt-get install python-dev
-sudo apt-get install alien
-sudo apt-get install wget
+sudo apt-get -qy install python-dev
+sudo apt-get -qy install alien
+sudo apt-get -qy install wget
+sudo apt-get -qy install python-matplotlib
+sudo apt-get -qy install gfortran
+sudo apt-get -qy install openmpi-bin openmpi-doc libopenmpi-dev
 
 # Get pip in order to install python packages well.
 sudo apt-get -qy install python-pip
@@ -13,6 +16,11 @@ sudo apt-get -qy install python-pip
 # Install necessary python packages using pip
 sudo pip install numpy
 sudo pip install astropy
+sudo pip install healpy
+sudo pip install f2py
+sudo pip install pyfits
+sudo pip install mpi4py
+sudo pip install MLZ
 
 # Install SExtractor
 mkdir sextractor
