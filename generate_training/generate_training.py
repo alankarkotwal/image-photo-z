@@ -6,6 +6,7 @@ from astropy.io import fits
 import os
 import math
 import urllib
+import time
 
 # A note on objClass: Since we store the data in BinTableHDU, we need an encoding scheme for objClass. Here, I have
 # 1: Galaxy
@@ -196,7 +197,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 		catalogFile.close()
 
 
-def generate_training_background(segImageNames, imageFileNames, outdir):
+def generate_training_background(segImageNames, imageFileNames, outdir, nMaxDataPoints=1000):
 	
 	redshift=-1.0
 	redshiftError=0.0
@@ -240,25 +241,31 @@ def generate_training_background(segImageNames, imageFileNames, outdir):
 	trainingArray[0].append("PixelRA")
 	trainingArray[0].append("PixelDec")
 	
+	nPixels=0
+	
 	for i in range(xshape):
 		for j in range(yshape):
-			isObjectHere=0
-			for k in segImages:
-				if k[i][j]!=0:
-					isObjectHere=1
-			if isObjectHere==0:
-				isPixelValid=1
-				for k in fitsImages:
-					if math.isnan(k[i][j]):
-						isPixelValid=0
-				if isPixelValid==1:
-					trainingVector=[]
+			if nPixels<=nMaxDataPoints:
+				isObjectHere=0
+				for k in segImages:
+					if k[i][j]!=0:
+						isObjectHere=1
+				if isObjectHere==0:
+					isPixelValid=1
 					for k in fitsImages:
-						trainingVector.append(float(k[i][j]))
-					trainingVector.append(redshift)
-					trainingVector.append(redshiftError)
-					trainingVector.append(objClass)
-					trainingArray.append(trainingVector)
+						if math.isnan(k[i][j]):
+							isPixelValid=0
+					if isPixelValid==1:
+						trainingVector=[]
+						for k in fitsImages:
+							trainingVector.append(float(k[i][j]))
+						trainingVector.append(redshift)
+						trainingVector.append(redshiftError)	
+						trainingVector.append(objClass)
+						trainingArray.append(trainingVector)
+						nPixels=nPixels+1
+			else:
+				break
 				
 	trainingData=numpy.array(trainingArray)
 	filename=imageFileNames[0].split('/')[len(imageFileNames[0].split('/'))-1]
