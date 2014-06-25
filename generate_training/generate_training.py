@@ -128,6 +128,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 	
 		catalogFile=open(catalog, "r")
 		catalog=catalogFile.readlines()
+		
+		outlist=open(outdir+"/"+catagory+"/"+catagory+".list","a")
 	
 		for i in objects:
 			if i[0] is '#' or None:
@@ -180,7 +182,9 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 				
 					specObjID=catalog[int(i.split()[0])-1].split(',')[1]
 					
-					outfile=open(outdir+"/"+catagory+"/"+specObjID+"-"+str(time.time())+".csv","w")
+					objFileName=specObjID+"-"+str(time.time())+".csv"
+					outlist.write(objFileName+"\n")					
+					outfile=open(outdir+"/"+catagory+"/"+objFileName,"w")
 				
 					for entry in trainingArray:
 						for column in entry:
@@ -195,6 +199,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 	
 		objectsFile.close()	
 		catalogFile.close()
+		outlist.close()
 
 
 def generate_training_background(segImageNames, imageFileNames, outdir, nMaxDataPoints=1000):
@@ -243,6 +248,8 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 	
 	nPixels=0
 	
+	outlist=open(outdir+"/BACKGROUND/BACKGROUND.list","a")
+	
 	for i in range(xshape):
 		for j in range(yshape):
 			if nPixels<=nMaxDataPoints:
@@ -271,6 +278,7 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 	filename=imageFileNames[0].split('/')[len(imageFileNames[0].split('/'))-1]
 	
 	outfile=open(outdir+"/BACKGROUND/"+filename+".csv","w")
+	outlist.write(filename+".csv\n")
 	
 	for entry in trainingArray:
 		for column in entry:
