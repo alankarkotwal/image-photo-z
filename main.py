@@ -5,9 +5,11 @@ __author__='Alankar Kotwal'
 import sys
 sys.path.insert(0, 'image_registration')
 sys.path.insert(0, 'generate_training')
+sys.path.insert(0, 'training')
 
 from image_registration import *
 from generate_training import *
+from training import *
 import montage_wrapper
 import os
 import time
@@ -59,3 +61,5 @@ for i in logfileLines:
 	generate_training_background(seg_image_list, images_list, "data")
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
+
+prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", "training/trainingData.train")
