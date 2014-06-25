@@ -22,7 +22,7 @@ except OSError:
 
 preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
 
-download_images("one_square_degree_processed.csv", "images", logfile="logfile")
+#download_images("one_square_degree_processed.csv", "images", logfile="logfile")
 
 logfile=open("logfile", "r")
 logfileLines=logfile.readlines()

@@ -62,7 +62,7 @@ def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','
 		field=i.split(',')[9].rstrip()
 		try:
 			for band in bands:
-				downloadURL="http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2\n"
+				downloadURL="http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2"
 				if not os.path.isfile(downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits"):
 					print "Downloading", downloadURL
 					if band==bands[0]:
@@ -112,7 +112,7 @@ def sextract(imageFileNames, configFileNames, processDir, refBand='r', bands=['u
 	os.chdir(currDir)
 
 
-def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir):
+def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir, ):
 	if catagory not in ["GALAXY", "STAR", "QSO"]:
 		print "Argument catagory must be one of GALAXY, STAR and QSO."
 		return -1
