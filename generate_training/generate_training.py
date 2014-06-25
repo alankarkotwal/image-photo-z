@@ -50,6 +50,29 @@ def generate_download_list(catalog, output, bands=['u','g','r','i','z'], rerun="
 	catalogFile.close()
 	outputFile.close()
 
+
+def make_logfile(catalog, logfile="logfile"):
+	catalogFile=open(catalog, "r")
+	catalogLines=catalogFile.readlines()
+	logfileFile=open(logfile,"w")
+	
+	loglines=[]
+	
+	for i in calalogLines:
+		run=i.split(',')[7]
+		camcol=i.split(',')[8]
+		field=i.split(',')[9].rstrip()
+		filename=run+"-"+camcol+"-"+field
+		if filename not in loglines:
+			loglines.append(filename)
+	
+	for i in loglines:
+		logfileFile.write(i+"\n")
+		
+	catalogFile.close()
+	logfileFile.close()
+		
+
 	
 def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','r','i','z'], rerun="301"):
 	catalogFile=open(catalog, "r")

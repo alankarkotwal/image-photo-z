@@ -13,7 +13,7 @@ from training import *
 import montage_wrapper
 import os
 import time
-'''
+
 start=time.time()
 
 try:
@@ -28,7 +28,8 @@ except OSError:
 
 preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
 
-#download_images("one_square_degree_processed.csv", "images", logfile="logfile")
+download_images("one_square_degree_processed.csv", "images", logfile="logfile")
+make_logfile("one_square_degree_processed.csv")
 
 logfile=open("logfile", "r")
 logfileLines=logfile.readlines()
@@ -63,7 +64,7 @@ for i in logfileLines:
 	print (time.time()-start)/60
 
 prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", "training/trainingData.train")
-'''
+
 #**************************
 # Training has ended here.*
 #**************************
@@ -77,6 +78,7 @@ except OSError:
 preprocess_catalog("another_square_degree.csv", "another_square_degree_processed.csv")
 
 download_images("another_square_degree_processed.csv", "images_test", logfile="logfile")
+make_logfile("another_square_degree_processed.csv")
 
 logfile=open("logfile", "r")
 logfileLines=logfile.readlines()
@@ -111,3 +113,9 @@ for i in logfileLines:
 	print (time.time()-start)/60
 
 prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data_test", "training/testingData.train")
+
+#train("trainingData.train", "testingData.train", "training/", "inputfileTemplate.mlz", "inputfile.mlz")
+
+end=time.time()
+
+print end-start
