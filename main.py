@@ -1,3 +1,5 @@
+__author__='Alankar Kotwal'
+
 import sys
 sys.path.insert(0, 'image_registration')
 sys.path.insert(0, 'generate_training')
