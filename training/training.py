@@ -88,44 +88,49 @@ def prepare_for_training_kNN(catagories, dataDir, outfiles):
 	outputFileTarget.close()
 
 	
-def train_test_kNN(trainData, trainTargets, testData, testPredictions, nNeighbors=5):
+def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5):
 	trainDataFile=open(trainData, "r")
 	targetFile=open(trainTargets, "r")
 	testDataFile=open(testData, "r")
 	predFile=open(testPredictions, "w")
+	testTargetFile=open(trainTargets, "r")
 	
 	trainDataLines=trainDataFile.readlines()
 	targetFileLines=targetFile.readlines()
 	testDataLines=testDataFile.readlines()
+	testTargetLines=testTargetFile.readlines()
+	
+	testTargetFile.close()
+	testTargetFile=open(trainTargets, "w")
 	
 	trainData=[]
 	testData=[]
 	targets=[]
+
+	for i in range(len(trainDataLines)):
+		isEntryValid=1
+		vec=trainDataLines[i].split()
+		for j in range(len(vec)):
+			if math.isnan(float(vec[j])):
+				isEntryValid=0
+				break
+			vec[j]=float(vec[j].rstrip())
+		if isEntryValid==1:
+			trainData.append(vec)
+			targets.append(float(targetFileLines[i].rstrip()))
 	
-	nNaN=0
-	
-	for i in trainDataLines:
+
+	for i in testDataLines:
+		isEntryValid=1
 		vec=i.split()
 		for i in range(len(vec)):
 			if math.isnan(float(vec[i])):
-				print "NaN"
-				nNaN=nNaN+1
+				isEntryValid=0
+				break
 			vec[i]=float(vec[i])
-		trainData.append(vec)
-	
-	print nNaN
-		
-	for i in testDataLines:
-		vec=i.split()
-		for i in range(len(vec)):
-			vec[i]=float(vec[i])
-		testData.append(vec)
-
-	for i in targetFileLines:
-		vec=i.split()
-		for i in range(len(vec)):
-			vec[i]=float(vec[i])
-		targets.append(vec)
+		if isEntryValid==1:
+			testData.append(vec)
+			testTargetFile.write(testTargetLines[i])
 		
 	trainArray=np.asarray(trainData)
 	testArray=np.asarray(testData)
@@ -133,15 +138,16 @@ def train_test_kNN(trainData, trainTargets, testData, testPredictions, nNeighbor
 	
 	trainArrayScaled=prep.scale(trainArray)
 	testArrayScaled=prep.scale(testArray)
-
+	
 	regressor=kNNR(n_neighbors=nNeighbors)
 	regressor.fit(trainArrayScaled, targetArray)
 	
-	for i in testData:
-		predFile.write(str(regressor.predict(i))+'\n')
+	for i in testArrayScaled:
+		prediction=regressor.predict(i)
+		predFile.write(str(prediction[0])+'\n')
 		
 	trainDataFile.close()
 	testDataFile.close()
 	targetFile.close()
 	predFile.close()
-
+	testTargetFile.close()

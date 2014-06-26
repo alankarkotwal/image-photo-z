@@ -15,7 +15,7 @@ import os
 import time
 
 start=time.time()
-
+'''
 try:
 	os.mkdir("data")
 	os.mkdir("data/GALAXY")
@@ -113,11 +113,11 @@ for i in logfileLines:
 	generate_training_background(seg_image_list, images_list, "data_test")
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
-
+'''
 prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", ["training/trainingData.train", "training/trainingTargets.train"])
 prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data_test", ["training/testingData.train", "training/testingTargets.train"])
 
-train_test_kNN("training/trainingData.train", "training/trainingTargets.train", "training/testingData.train", "training/testingPredictions.train")
+train_test_kNN("training/trainingData.train", "training/trainingTargets.train", "training/testingData.train", "training/testingTargets.train", "training/testingPredictions.train")
 
 end=time.time()
 
