@@ -63,8 +63,6 @@ for i in logfileLines:
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
 
-prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", "training/trainingData.train")
-
 #**************************
 # Training has ended here.*
 #**************************
@@ -72,6 +70,10 @@ prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", "training/
 try:
 	os.mkdir("images_test")
 	os.mkdir("data_test")
+	os.mkdir("data_test/GALAXY")
+	os.mkdir("data_test/STAR")
+	os.mkdir("data_test/QSO")
+	os.mkdir("data_test/BACKGROUND")
 except OSError:
 	pass
 
@@ -112,9 +114,10 @@ for i in logfileLines:
 	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
 
-prepare_for_training(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data_test", "training/testingData.train")
+prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", ["training/trainingData.train", "training/trainingTargets.train"])
+prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data_test", ["training/testingData.train", "training/testingTargets.train"])
 
-#train("trainingData.train", "testingData.train", "training/", "inputfileTemplate.mlz", "inputfile.mlz")
+train_test_kNN("training/trainingData.train", "training/trainingTargets.train", "training/testingData.train", "training/testingPredictions.train")
 
 end=time.time()
 

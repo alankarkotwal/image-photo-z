@@ -191,16 +191,21 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					trainingArray[0].append("PixelDec")
 					for j in range(max(0,int(i.split()[3])), min(int(i.split()[4]),segImage.shape[0]-1)):
 						for k in range(max(0,int(i.split()[5])), min(int(i.split()[6]),segImage.shape[1]-1)):
-							if segImage[k][j]==thisObjFlag:
-								trainingVector=[]
-								for l in fitsImages:
-									trainingVector.append(float(l[k][j]))
-								trainingVector.append(redshift)
-								trainingVector.append(redshiftError)
-								trainingVector.append(objClass)
-								trainingVector.append(pixelRA)
-								trainingVector.append(pixelDec)
-								trainingArray.append(trainingVector)
+							isPixelValid=1
+							for l in fitsImages:
+								if math.isnan(float(l[k][j])):
+									isPixelValid=0
+							if isPixelValid==1:
+								if segImage[k][j]==thisObjFlag:
+									trainingVector=[]
+									for l in fitsImages:
+										trainingVector.append(float(l[k][j]))
+									trainingVector.append(redshift)
+									trainingVector.append(redshiftError)
+									trainingVector.append(objClass)
+									trainingVector.append(pixelRA)
+									trainingVector.append(pixelDec)
+									trainingArray.append(trainingVector)
 								
 				
 					specObjID=catalog[int(i.split()[0])-1].split(',')[1]
@@ -283,7 +288,7 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 				if isObjectHere==0:
 					isPixelValid=1
 					for k in fitsImages:
-						if math.isnan(k[i][j]):
+						if math.isnan(float(k[i][j])):
 							isPixelValid=0
 					if isPixelValid==1:
 						trainingVector=[]
