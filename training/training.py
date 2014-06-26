@@ -93,7 +93,7 @@ def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictio
 	targetFile=open(trainTargets, "r")
 	testDataFile=open(testData, "r")
 	predFile=open(testPredictions, "w")
-	testTargetFile=open(trainTargets, "r")
+	testTargetFile=open(testTargets, "r")
 	
 	trainDataLines=trainDataFile.readlines()
 	targetFileLines=targetFile.readlines()
@@ -101,7 +101,7 @@ def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictio
 	testTargetLines=testTargetFile.readlines()
 	
 	testTargetFile.close()
-	testTargetFile=open(trainTargets, "w")
+	testTargetFile=open(testTargets, "w")
 	
 	trainData=[]
 	testData=[]
@@ -120,14 +120,14 @@ def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictio
 			targets.append(float(targetFileLines[i].rstrip()))
 	
 
-	for i in testDataLines:
+	for i in range(len(testDataLines)):
 		isEntryValid=1
-		vec=i.split()
-		for i in range(len(vec)):
-			if math.isnan(float(vec[i])):
+		vec=testDataLines[i].split()
+		for j in range(len(vec)):
+			if math.isnan(float(vec[j])):
 				isEntryValid=0
 				break
-			vec[i]=float(vec[i])
+			vec[j]=float(vec[j])
 		if isEntryValid==1:
 			testData.append(vec)
 			testTargetFile.write(testTargetLines[i])
