@@ -21,6 +21,7 @@ sudo pip install f2py
 sudo pip install pyfits
 sudo pip install mpi4py
 sudo pip install MLZ
+sudo pip install scikit-learn
 
 # Install SExtractor
 mkdir sextractor
