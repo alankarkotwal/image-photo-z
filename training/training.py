@@ -167,11 +167,15 @@ def generate_kNN_output(testingPredictions, testingTargets, outfile):
 	i=1
 	
 	while i<len(testPreds):
-		while float(testTargets[i].rstrip())==float(testTargets[i-1].rstrip()):
+		while i<len(testPreds) and float(testTargets[i].rstrip())==float(testTargets[i-1].rstrip()):
 			nPixels=nPixels+1
 			totalZ=totalZ+float(testPreds[i].rstrip())
 			i=i+1
-		output.write(testTargets[i-1].rstrip()+"\t"+str(totalZ/nPixels)+"\n")	
+			if i==len(testPreds):
+				break
+		output.write(testTargets[i-1].rstrip()+"\t"+str(totalZ/nPixels)+"\n")
+		if i==len(testPreds):
+			break
 		nPixels=1
 		totalZ=float(testPreds[i].rstrip())
 		i=i+1

@@ -14,6 +14,8 @@ import montage_wrapper
 import os
 import time
 
+#os.system("rm -rf data/ data_test/")
+
 start=time.time()
 '''
 try:
