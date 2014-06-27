@@ -151,3 +151,31 @@ def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictio
 	targetFile.close()
 	predFile.close()
 	testTargetFile.close()
+
+
+def generate_kNN_output(testingPredictions, testingTargets, outfile):
+	testPredFile=open(testingPredictions, "r")
+	testTargFile=open(testingTargets, "r")
+	output=open(outfile, "w")
+	
+	testPreds=testPredFile.readlines()
+	testTargets=testTargFile.readlines()
+	
+	nPixels=1	
+	totalZ=float(testPreds[0].rstrip())
+	
+	i=1
+	
+	while i<len(testPreds):
+		while float(testTargets[i].rstrip())==float(testTargets[i-1].rstrip()):
+			nPixels=nPixels+1
+			totalZ=totalZ+float(testPreds[i].rstrip())
+			i=i+1
+		output.write(testTargets[i-1].rstrip()+"\t"+str(totalZ/nPixels)+"\n")	
+		nPixels=1
+		totalZ=float(testPreds[i].rstrip())
+		i=i+1
+	
+	testPredFile.close()
+	testTargFile.close()
+	output.close()
