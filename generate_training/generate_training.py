@@ -262,12 +262,12 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 	
 	trainingArray=[[]]
 	for j in imageFileNames:
-		fitsFiles.append(fits.open(j))
-		fitsImages.append(fitsFiles[k][0].data)
 		if j==imageFileNames[0]:
 			trainingArray[0].append("# "+j+"Flux")
 		else:
 			trainingArray[0].append(j+"Flux")
+			
+	print len(fitsImages)
 	trainingArray[0].append("Redshift")
 	trainingArray[0].append("RedshiftError")
 	trainingArray[0].append("Class")
@@ -287,13 +287,13 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 						isObjectHere=1
 				if isObjectHere==0:
 					isPixelValid=1
-					for k in fitsImages:
-						if math.isnan(float(k[i][j])):
+					for l in fitsImages:
+						if math.isnan(float(l[i][j])):
 							isPixelValid=0
 					if isPixelValid==1:
 						trainingVector=[]
-						for k in fitsImages:
-							trainingVector.append(float(k[i][j]))
+						for m in fitsImages:
+							trainingVector.append(float(m[i][j]))
 						trainingVector.append(redshift)
 						trainingVector.append(redshiftError)	
 						trainingVector.append(objClass)
