@@ -44,8 +44,8 @@ try:
 	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/QSO")
 	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
 	os.mkdir(configOptions['PROCESSING_DIR'])
-	os.mkdir(configOptions['TRAINING_IMAGES_DIR'])
 	os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR'])
+	os.mkdir(configOptions['TRAINING_IMAGES_DIR'])
 except OSError:
 	pass
 
