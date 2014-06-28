@@ -1,1 +1,0 @@
-rm -rf data/ one_square_degree_processed.csv another_square_degree_processed.csv processing/*.cat processing/*.fits processing/*.fits training/trainingData.train
