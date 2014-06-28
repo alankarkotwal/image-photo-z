@@ -280,7 +280,7 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 	
 	for i in range(xshape):
 		for j in range(yshape):
-			if nPixels<=nMaxDataPoints:
+			if nPixels<nMaxDataPoints:
 				isObjectHere=0
 				for k in segImages:
 					if k[i][j]!=0:
