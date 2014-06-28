@@ -3,53 +3,31 @@
 __author__='Alankar Kotwal'
 
 import sys
-import montage_wrapper
-import os
-import time
-
-configOptions={}
-
-try:
-	configFile=open(sys.argv[1], "r")
-except IndexError:
-	configFile=open("config.cfg", "r")
-configLines=configFile.readlines()
-
-for line in configLines:
-	if line[0]=='#' or line[0]=='\n':
-		pass
-	else:
-		try:
-			configOptions[line.split('=')[0]]=line.split('=')[1].rstrip()
-		except IndexError:
-			pass
-
-		
-sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/image_registration')
-sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/generate_training')
-sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/training')
+sys.path.insert(0, 'image_registration')
+sys.path.insert(0, 'generate_training')
+sys.path.insert(0, 'training')
 
 from image_registration import *
 from generate_training import *
 from training import *
-
+import montage_wrapper
+import os
+import time
 
 #os.system("rm -rf data/ data_test/")
 
-#start=time.time()
+start=time.time()
 
 try:
-	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/GALAXY")
-	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/STAR")
-	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/QSO")
-	os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
-	os.mkdir(configOptions['PROCESSING_DIR'])
-	os.mkdir(configOptions['TRAIN_IMAGES_DIR'])
-	os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR'])
+	os.mkdir("data")
+	os.mkdir("data/GALAXY")
+	os.mkdir("data/STAR")
+	os.mkdir("data/QSO")
+	os.mkdir("data/BACKGROUND")
+	os.mkdir("images")
 except OSError:
 	pass
-'''
+
 preprocess_catalog("one_square_degree.csv", "one_square_degree_processed.csv")
 
 download_images("one_square_degree_processed.csv", "images", logfile="logfile")
@@ -84,7 +62,7 @@ for i in logfileLines:
 		generate_training_objects("processing/ref.cat", "processing/ref.fits", "one_square_degree_processed.csv", images_list, catagory, "data")
 	print "BACKGROUND"
 	generate_training_background(seg_image_list, images_list, "data")
-	os.system("rm processing/*.fits processing/*.cat processing/*.hdr processing/*.list")
+	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
 
 #**************************
@@ -135,7 +113,7 @@ for i in logfileLines:
 		generate_training_objects("processing/ref.cat", "processing/ref.fits", "another_square_degree_processed.csv", images_list, catagory, "data_test")
 	print "BACKGROUND"
 	generate_training_background(seg_image_list, images_list, "data_test")
-	os.system("rm processing/*.fits processing/*.cat processing/*.hdr processing/*.list")
+	os.system("rm processing/*.fits processing/*.cat processing/*.hdr")
 	print (time.time()-start)/60
 
 prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data", ["training/trainingData.train", "training/trainingTargets.train"])
@@ -144,7 +122,7 @@ prepare_for_training_kNN(["GALAXY", "STAR", "QSO", "BACKGROUND"], "data_test", [
 train_test_kNN("training/trainingData.train", "training/trainingTargets.train", "training/testingData.train", "training/testingTargets.train", "training/testingPredictions.train", 1000)
 
 generate_kNN_output("training/testingPredictions.train", "training/testingTargets.train", "kNNOutput.csv")
-'''
-#end=time.time()
 
-#print end-start
+end=time.time()
+
+print end-start
