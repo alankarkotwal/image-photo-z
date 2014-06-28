@@ -266,8 +266,7 @@ def generate_training_background(segImageNames, imageFileNames, outdir, nMaxData
 			trainingArray[0].append("# "+j+"Flux")
 		else:
 			trainingArray[0].append(j+"Flux")
-			
-	print len(fitsImages)
+
 	trainingArray[0].append("Redshift")
 	trainingArray[0].append("RedshiftError")
 	trainingArray[0].append("Class")
