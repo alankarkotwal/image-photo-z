@@ -87,7 +87,7 @@ def download_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','
 			for band in bands:
 				downloadURL="http://data.sdss3.org/sas/dr10/boss/photoObj/frames/"+rerun+"/"+run+"/"+camcol+"/frame-"+band+"-"+run.zfill(6)+"-"+camcol+"-"+field.zfill(4)+".fits.bz2"
 				if not os.path.isfile(downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits"):
-					print "Downloading", downloadURL
+					#print "Downloading", downloadURL
 					if band==bands[0]:
 						logfileFile.write(run+"-"+camcol+"-"+field+"\n")
 					urllib.urlretrieve(downloadURL, downloadFolder+"/"+run+"-"+camcol+"-"+field+"-"+band+".fits.bz2")
