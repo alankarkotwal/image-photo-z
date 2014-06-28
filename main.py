@@ -3,7 +3,6 @@
 __author__='Alankar Kotwal'
 
 import sys
-import montage_wrapper
 import os
 import time
 
@@ -24,7 +23,17 @@ for line in configLines:
 		except IndexError:
 			pass
 
-		
+catagories=[]
+if configOptions['USE_GALAXIES']=='yes':
+	catagories.append("GALAXY")
+if configOptions['USE_STARS']=='yes':
+	catagories.append("STAR")
+if configOptions['USE_QSOS']=='yes':
+	catagories.append("QSO")
+
+bandsList=configOptions['BANDS']
+bands=bandsList.split(',')
+	
 sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/image_registration')
 sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/generate_training')
 sys.path.insert(0, configOptions['IMAGE_PHOTOZ_PATH']+'/training')
@@ -37,130 +46,124 @@ from training import *
 
 #start=time.time()
 try:
-	try:
-		os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-		os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/GALAXY")
-		os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/STAR")
-		os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/QSO")
-		os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
-		os.mkdir(configOptions['PROCESSING_DIR'])
-		os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR'])
-		os.mkdir(configOptions['TRAINING_IMAGES_DIR'])
-	except OSError:
-		pass
+	if configOptions['REGENERATE_PIXEL_DATA']=='yes':
+		try:
+			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
+			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/GALAXY")
+			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/STAR")
+			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/QSO")
+			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
+			os.mkdir(configOptions['PROCESSING_DIR'])
+			os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR'])
+			os.mkdir(configOptions['TRAINING_IMAGES_DIR'])
+		except OSError:
+			pass
 
-	preprocess_catalog(configOptions['TRAINING_CATALOG'], configOptions['TRAINING_CATALOG_PROCESSED'])
+		preprocess_catalog(configOptions['TRAINING_CATALOG'], configOptions['TRAINING_CATALOG_PROCESSED'])
 
-	download_images(configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['TRAINING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
-	if configOptions['LOG_INDEPENDENTLY']=='yes':
-		make_logfile(configOptions['TRAINING_CATALOG_PROCESSED'])
+		download_images(configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['TRAINING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
+		if configOptions['LOG_INDEPENDENTLY']=='yes':
+			make_logfile(configOptions['TRAINING_CATALOG_PROCESSED'])
 
-	catagories=[]
-	if configOptions['USE_GALAXIES']=='yes':
-		catagories.append("GALAXY")
-	if configOptions['USE_STARS']=='yes':
-		catagories.append("STAR")
-	if configOptions['USE_QSOS']=='yes':
-		catagories.append("QSO")
+		logfile=open(configOptions['LOGFILE'], "r")
+		logfileLines=logfile.readlines()
+		logfile.close()
 
-	logfile=open(configOptions['LOGFILE'], "r")
-	logfileLines=logfile.readlines()
-	logfile.close()
+		for i in logfileLines:
+			iden=i.rstrip()
+			print iden
+			os.system("cp "+configOptions['TRAINING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
+			list_in=[]
+			images_list=[]
+			sex_image_list=[]
+			seg_image_list=[]
+			sexConfigFiles=[]
+			ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
+			for band in bands:
+				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
+				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
+				sex_image_list.append(iden+"-"+band+"_reg.fits")
+				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
+				sexConfigFiles.append(band+".sex")
 
-	for i in logfileLines:
-		iden=i.rstrip()
-		print iden
-		os.system("cp "+configOptions['TRAINING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
-		list_in=[]
-		images_list=[]
-		sex_image_list=[]
-		seg_image_list=[]
-		sexConfigFiles=[]
-		ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
-		for band in ['u','g','r','i','z']:
-			list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
-			images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
-			sex_image_list.append(iden+"-"+band+"_reg.fits")
-			seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
-			sexConfigFiles.append(band+".sex")
+			register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
+			convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
+			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
+			for catagory in catagories:
+				print catagory
+				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TRAINING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
+			if configOptions['USE_BACKGROUND']=='yes':
+				print "BACKGROUND"
+				generate_training_background(seg_image_list, images_list, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
+			os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			if configOptions['TIME']=='yes':
+				print (time.time()-start)/60
 
-		register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
-		convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
-		sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
-		for catagory in catagories:
-			print catagory
-			generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TRAINING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-		if configOptions['USE_BACKGROUND']=='yes':
-			print "BACKGROUND"
-			generate_training_background(seg_image_list, images_list, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-		os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-		if configOptions['TIME']=='yes':
-			print (time.time()-start)/60
+		#**************************
+		# Training has ended here.*
+		#**************************
 
-	#**************************
-	# Training has ended here.*
-	#**************************
+		try:
+			os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR'])
+			os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/GALAXY")
+			os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/STAR")
+			os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/QSO")
+			os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
+			os.mkdir(configOptions['TESTING_IMAGES_DIR'])
+		except OSError:
+			pass
 
-	try:
-		os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-		os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/GALAXY")
-		os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/STAR")
-		os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/QSO")
-		os.mkdir(configOptions['TESTING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
-		os.mkdir(configOptions['TESTING_IMAGES_DIR'])
-	except OSError:
-		pass
+		preprocess_catalog(configOptions['TESTING_CATALOG'], configOptions['TESTING_CATALOG_PROCESSED'])
 
-	preprocess_catalog(configOptions['TESTING_CATALOG'], configOptions['TESTING_CATALOG_PROCESSED'])
+		download_images(configOptions['TESTING_CATALOG_PROCESSED'], configOptions['TESTING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
+		if configOptions['LOG_INDEPENDENTLY']=='yes':
+			make_logfile(configOptions['TESTING_CATALOG_PROCESSED'])
 
-	download_images(configOptions['TESTING_CATALOG_PROCESSED'], configOptions['TESTING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
-	if configOptions['LOG_INDEPENDENTLY']=='yes':
-		make_logfile(configOptions['TESTING_CATALOG_PROCESSED'])
+		logfile=open(configOptions['LOGFILE'], "r")
+		logfileLines=logfile.readlines()
+		logfile.close()
 
-	logfile=open(configOptions['LOGFILE'], "r")
-	logfileLines=logfile.readlines()
-	logfile.close()
+		for i in logfileLines:
+			iden=i.rstrip()
+			print iden
+			os.system("cp "+configOptions['TESTING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
+			list_in=[]
+			images_list=[]
+			sex_image_list=[]
+			seg_image_list=[]
+			sexConfigFiles=[]
+			ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
+			for band in bands:
+				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
+				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
+				sex_image_list.append(iden+"-"+band+"_reg.fits")
+				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
+				sexConfigFiles.append(band+".sex")
 
-	for i in logfileLines:
-		iden=i.rstrip()
-		print iden
-		os.system("cp "+configOptions['TESTING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
-		list_in=[]
-		images_list=[]
-		sex_image_list=[]
-		seg_image_list=[]
-		sexConfigFiles=[]
-		ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
-		for band in ['u','g','r','i','z']:
-			list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
-			images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
-			sex_image_list.append(iden+"-"+band+"_reg.fits")
-			seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
-			sexConfigFiles.append(band+".sex")
+			register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
+			convert_catalog_to_exp_pixels(ref_image, configOptions['TESTING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
+			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
+			for catagory in catagories:
+				print catagory
+				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TESTING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
+			if configOptions['USE_BACKGROUND']=='yes':	
+				print "BACKGROUND"
+				generate_training_background(seg_image_list, images_list, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
+			os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			if configOptions['TIME']=='yes':
+				print (time.time()-start)/60
 
-		register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
-		convert_catalog_to_exp_pixels(ref_image, configOptions['TESTING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
-		sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
-		for catagory in catagories:
-			print catagory
-			generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TESTING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-		if configOptions['USE_BACKGROUND']=='yes':	
-			print "BACKGROUND"
-			generate_training_background(seg_image_list, images_list, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-		os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-		if configOptions['TIME']=='yes':
-			print (time.time()-start)/60
-
-	if configOptions['ALGORITHM']=='kNN':
-		if configOptions['PROBLEM_TYPE']=='regression':
-			prepare_for_training_kNN_regression(catagories, configOptions['TRAINING_CLASSIFIED_DATA_DIR'], [configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE']])
-			prepare_for_training_kNN_regression(catagories, configOptions['TESTING_CLASSIFIED_DATA_DIR'], [configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE']])
-			train_test_kNN_regression(configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE'], configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['TESTING_PREDICTION_FILE'], configOptions['NUMBER_NEIGHBORS'])
-			generate_kNN_output(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
-		elif configOptions['PROBLEM_TYPE']=='classification':
+	if configOptions['TRAIN_AND_TEST']=='yes':	
+		if configOptions['ALGORITHM']=='kNN':
+			if configOptions['PROBLEM_TYPE']=='regression':
+				prepare_for_training_kNN_regression(catagories, configOptions['TRAINING_CLASSIFIED_DATA_DIR'], [configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE']])
+				prepare_for_training_kNN_regression(catagories, configOptions['TESTING_CLASSIFIED_DATA_DIR'], [configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE']])
+				train_test_kNN_regression(configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE'], configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['TESTING_PREDICTION_FILE'], int(configOptions['NUMBER_NEIGHBORS']))
+				generate_kNN_output(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
+			elif configOptions['PROBLEM_TYPE']=='classification':
+				pass # To be written
+		elif configOptions['ALGORITHM']=='MLZ':
 			pass # To be written
-	elif configOptions['ALGORITHM']=='MLZ':
-		pass # To be written
 
 	if configOptions['CLEAN_AFTER_DONE']=='yes':
 		os.system("rm -rf "+configOptions['PROCESSING_DIR'])
@@ -169,7 +172,6 @@ try:
 		os.system("rm -rf "+configOptions['TRAINING_CATALOG_PROCESSED']+" "+configOptions['TESTING_CATALOG_PROCESSED'])
 		os.system("rm -rf "+configOptions['LOGFILE'])
 		os.system("rm -rf "+configOptions['TRAINING_DATA_FILE']+" "+configOptions['TRAINING_TARGET_FILE']+" "+configOptions['TESTING_DATA_FILE']+" "+configOptions['TESTING_TARGET_FILE']+" "+configOptions['TESTING_PREDICTION_FILE'])
-		os.system("rm -rf "+configOptions['KNN_OUTPUT_FILE'])
 
 	if configOptions['REMOVE_IMAGES_AFTER_DONE']=='yes':
 		os.system("rm -rf "+configOptions['TRAINING_IMAGES_DIR'])
