@@ -51,7 +51,7 @@ def train_MLZ(algorithm, predClass, trainingFileName, testingFileName, testDataP
 #****
 
 
-def prepare_for_training_kNN(catagories, dataDir, outfiles):
+def prepare_for_training_kNN_regression(catagories, dataDir, outfiles):
 	for catagory in catagories:
 		if catagory not in ["GALAXY", "STAR", "QSO", "BACKGROUND"]:
 			print "Arguments list catagories must contain some of GALAXY, STAR, QSO and BACKGROUND."
@@ -88,7 +88,7 @@ def prepare_for_training_kNN(catagories, dataDir, outfiles):
 	outputFileTarget.close()
 
 	
-def train_test_kNN(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5):
+def train_test_kNN_regression(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5):
 	trainDataFile=open(trainData, "r")
 	targetFile=open(trainTargets, "r")
 	testDataFile=open(testData, "r")
