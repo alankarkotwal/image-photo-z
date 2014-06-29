@@ -25,3 +25,4 @@
 logfile*
 *.list
 *.train
+*.cfg
