@@ -195,12 +195,12 @@ def prepare_for_training_kNN_classification(catagories, dataDir, outfiles):
 
 	outputFileData=open(outfiles[0], "w")
 	outputFileTarget=open(outfiles[1], "w")
+	
+	objno=1
 
 	for catagory in catagories:
 		listfile=open(dataDir+"/"+catagory+"/"+catagory+".list","r")
 		objlist=listfile.readlines()
-		
-		objno=1
 		
 		for i in objlist:
 			objfile=open(dataDir+"/"+catagory+"/"+i.rstrip(),"r")
@@ -210,14 +210,14 @@ def prepare_for_training_kNN_classification(catagories, dataDir, outfiles):
 				if j[0]=='#':
 				 	pass
 				else:
-				 	entryFields=j.split()
-				 	outputFileData.write(str(objno)+" ")
-				 	for k in range(5):
-				 		outputFileData.write(entryFields[k])
-				 		if k!=4:
-				 			outputFileData.write(" ")
-				 	outputFileData.write("\n")
-				 	outputFileTarget.write(entryFields[7]+'\n')
+					entryFields=j.split()
+					for k in range(5):
+						outputFileData.write(entryFields[k])
+						if k!=4:
+							outputFileData.write(" ")
+					outputFileData.write("\n")
+					outputFileTarget.write(str(objno)+" ")
+					outputFileTarget.write(entryFields[7]+'\n')
 			
 			objfile.close()
 			objno=objno+1
@@ -257,7 +257,7 @@ def train_test_kNN_classification(trainData, trainTargets, testData, testTargets
 			vec[j]=float(vec[j].rstrip())
 		if isEntryValid==1:
 			trainData.append(vec)
-			targets.append(float(targetFileLines[i].rstrip()))
+			targets.append(float(targetFileLines[i].split()[1].rstrip()))
 	
 
 	for i in range(len(testDataLines)):
@@ -293,7 +293,7 @@ def train_test_kNN_classification(trainData, trainTargets, testData, testTargets
 	testTargetFile.close()
 
 
-def generate_kNN_output_classification(testingPredictions, testingTargets, outfile):
+def generate_kNN_output_classification(testingPredictions, testingTargets, outfile, round_off=0):
 	testPredFile=open(testingPredictions, "r")
 	testTargFile=open(testingTargets, "r")
 	output=open(outfile, "w")
@@ -307,13 +307,16 @@ def generate_kNN_output_classification(testingPredictions, testingTargets, outfi
 	i=1
 	
 	while i<len(testPreds):
-		while i<len(testPreds) and float(testTargets[i].rstrip())==float(testTargets[i-1].rstrip()):
+		while i<len(testPreds) and float(testTargets[i].split()[0].rstrip())==float(testTargets[i-1].split()[0].rstrip()):
 			nPixels=nPixels+1
 			totalZ=totalZ+float(testPreds[i].rstrip())
 			i=i+1
 			if i==len(testPreds):
 				break
-		output.write(testTargets[i-1].rstrip()+"\t"+str(totalZ/nPixels)+"\n")
+		if round_off==0:
+			output.write(testTargets[i-1].split()[1].rstrip()+"\t"+str(totalZ/nPixels)+"\n")
+		else:
+			output.write(testTargets[i-1].split()[1].rstrip()+"\t"+str(round(totalZ/nPixels))+"\n")
 		if i==len(testPreds):
 			break
 		nPixels=1
