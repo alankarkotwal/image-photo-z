@@ -22,7 +22,7 @@ def register_reproject_direc(direc, ref='r'):
 	
 def register_reproject(inputImages, outputImages, refImage, processDir, headerName="header.hdr"):
 	cmds.mGetHdr(refImage,headerName)
-	mw.reproject(inputImages,outputImages,header=headerName,north_aligned=True,system='EQUJ',exact_size=True,common=True)
+	mw.reproject(inputImages,outputImages,header=headerName,north_aligned=True,system='EQUJ',exact_size=True,common=True,silent_cleanup=True)
 
 
 '''# Register using WCS only
