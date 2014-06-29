@@ -152,6 +152,9 @@ try:
 			os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
+				
+	if configOptions['USE_BACKGROUND']=='yes':
+		catagories.append("BACKGROUND")
 
 	if configOptions['TRAIN_AND_TEST']=='yes':	
 		if configOptions['ALGORITHM']=='kNN':
