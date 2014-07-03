@@ -81,7 +81,7 @@ C. *generate_training* module: This module generates pixel training data as requ
    * Function _generate\_download\_list(catalog, output, bands=['u','g','r','i','z'], rerun="301")_  
      Generates a image URL list of objects in _catalog_ to pass to _wget_ to download.  
      Parameters:
-       * _catalog: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
+       * _catalog_: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
        * _output_: _string_, Name of the output file. ex.: "download.list".
        * _bands_: _list_, optional, List of filters to download images in. ex.: ['u', 'r'].
        * _rerun_: _string_, optional, String of the current rerun number for the SDSS pipeline.
