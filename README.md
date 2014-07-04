@@ -13,6 +13,7 @@ _Pixel-level estimation of photometric redshifts for astronomical images._
   * Montage Image Mosaic Software for Astronomers
   * montage_wrapper package for Python
   * MLZ from LCDM and its dependencies
+  * Scikit-Learn
 
 ####Install Instructions:  
 The setup-* scripts take care of the installation of the package.  
@@ -89,9 +90,50 @@ C. *generate_training* module: This module generates pixel training data as requ
    * Function _download\_images(catalog, downloadFolder, logfile="logfile", bands=['u','g','r','i','z'], rerun="301")_  
      Generates a image URL list of objects in _catalog_ to pass to _wget_ to download.  
      Parameters:
-       * _catalog: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
+       * _catalog_: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
        * _output_: _string_, Name of the output file. ex.: "download.list".
        * _bands_: _list_, List of filters to download images in. ex.: ['u', 'r'].
+
+   * Function _make_logfile(catalog, logfile="logfile")_  
+     Generates a logfile of downloaded image names for further use.  
+     Parameters:
+       * _catalog_: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
+       * _logfile_: _string_, Name of the output logfile. ex.: "logfile".
+
+   * Function _convert\_catalog\_to\_exp\_pixels(filename, catalog, expPixelsList)_  
+     Converts a FITS header and the given catalog information to a list of expected pixel locations for objects.  
+     Parameters:
+       * _filename_: _string_, Name of the FITS file whose header is to be used. ex.: "r.fits".
+       * _catalog_: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
+       * _expPixelsList_: _string_, Name of the output listfile. ex.: "sky.list".
+
+   * Function _sextract(imageFileNames, configFileNames, processDir, refBand='r', bands=['u', 'g', 'r', 'i', 'z'])_  
+     Runs SExtractor and associates objects from the expected pixels list to the detected objects.  
+     Parameters:
+       * _imageFileNames_: _list_, List of the FITS input image files. ex.: ["r.fits", "g.fits"].
+       * _configFileNames_: _list_, List of SExtractor config files in the same order as the FITS files. ex.: ['u.sex', 'g.sex'].
+       * _processDir_: _string_, Name of the process directory in which the images are kept. ex.: "processing".
+       * _refBand_: _string_, optional, Reference band for the source extraction. ex.: 'r'.
+       * _bands_: _list_, optional, List of filters in which images have to be processed. ex.: ['u', 'g', 'r', 'i', 'z']
+
+   * Function _generate\_training\_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir)_  
+     Generates pixel-level training data.  
+     Parameters:
+       * _objectsFileName_: _string_, Name of the SExtractor output catalog file. ex.: "ref.cat".
+       * _segImageName_: _string_, Name of the SExtractor output segmentation image. ex.: "ref_seg.fits".
+       * _catalog_: _string_, Name of the catalog file. ex.: "one_square_degree_processed.csv".
+       * _imageFileNames_: _list_, List of the input filenames. ex.: ["r.fits", "g.fits"].
+       * _catagory_: _list_, Type of pixels to choose. Some of ["GALAXY", "STAR", "QSO"].
+       * _outdir_: _string_, Name of the directory in which output results should be placed. ex.: "data".
+
+
+   * Function _generate\_training\_background(segImageNames, imageFileNames, outdir, nMaxDataPoints=1000)_  
+     Generates pixel-level training data.  
+     Parameters:
+       * _segImageNames_: _list_, List of the SExtractor output segmentation image names. ex.: ["r_seg.fits", "u_seg.fits"].
+       * _imageFileNames_: _list_, List of the input filenames. ex.: ["r.fits", "g.fits"].
+       * _outdir_: _string_, Name of the directory in which output results should be placed. ex.: "data".
+       * _nMaxDataPoints_: _int_, optional, Maximum number of background pixels to retain as data. ex.: 1000.
 
 
 ####Getting the code working:
