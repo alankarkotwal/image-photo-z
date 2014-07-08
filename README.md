@@ -144,7 +144,7 @@ C. *training* module: This module trains a machine learning algorithm using data
        * _dataDir_: _string_, Name of the directory in which input results are located. ex.: "data".
        * _outfiles_: _list_, [Name of datafile, name of targetfile]. ex.: ["training/trainingData.train", "training/trainingTargets.train"].
 
-  * Function _train_test_kNN_regression(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5)_
+  * Function _train\_test\_kNN\_regression(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5)_
     Train a kNN regressor and test it using some data.
        * _trainData_: _string_, Name of the training datafile. ex.: "trainingData.train".
        * _trainTargets_: _string_, Name of the training targetfile. ex.: "trainingTargets.train".
@@ -153,7 +153,7 @@ C. *training* module: This module trains a machine learning algorithm using data
        * _testPredictions_: _string_, Name of the testing prediction file. ex.: "testingPredictions.train".
        * _nNeighbors_: _int_, optional, Number of neighbors to use. ex.: 5.
 
-  * Function _generate_kNN_output_regression(testingPredictions, testingTargets, outfile)_
+  * Function _generate\_kNN\_output\_regression(testingPredictions, testingTargets, outfile)_
     Generate an output file consisting of predicted object averages and actual values from regression output files for further processing.
        * _testPredictions_: _string_, Name of the testing prediction file. ex.: "testingPredictions.train".
        * _testingTargets_: _string_, Name of the testing targetfile. ex.: "testingTargets.train".
@@ -165,7 +165,7 @@ C. *training* module: This module trains a machine learning algorithm using data
        * _dataDir_: _string_, Name of the directory in which input results are located. ex.: "data".
        * _outfiles_: _list_, [Name of datafile, name of targetfile]. ex.: ["training/trainingData.train", "training/trainingTargets.train"].
 
-  * Function _train_test_kNN_classification(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5)_
+  * Function _train\_test\_kNN\_classification(trainData, trainTargets, testData, testTargets, testPredictions, nNeighbors=5)_
     Train a kNN classifier and test it using some data.
        * _trainData_: _string_, Name of the training datafile. ex.: "trainingData.train".
        * _trainTargets_: _string_, Name of the training targetfile. ex.: "trainingTargets.train".
@@ -174,12 +174,27 @@ C. *training* module: This module trains a machine learning algorithm using data
        * _testPredictions_: _string_, Name of the testing prediction file. ex.: "testingPredictions.train".
        * _nNeighbors_: _int_, optional, Number of neighbors to use. ex.: 5.
 
-  * Function _generate_kNN_output_classification(testingPredictions, testingTargets, outfile round_off=0)_
+  * Function _generate\_kNN\_output\_classification(testingPredictions, testingTargets, outfile round_off=0)_
     Generate an output file consisting of predicted object averages and actual values from classification output files for further processing.
        * _testPredictions_: _string_, Name of the testing prediction file. ex.: "testingPredictions.train".
        * _testingTargets_: _string_, Name of the testing targetfile. ex.: "testingTargets.train".
        * _outfile_: _string_, Name of the output file. ex.: "kNNOutput_classification.csv".
        * _round\_off_: _bool_, Switch to select whether or not to round-off classification average results. One of "True" and "False".
+
+C. *get_images* module: This module gets images from SDSS servers via Montage utilities.
+
+  * Function _get\_image\_lists(obj, width, height, survey="SDSS", bands=['u','g','r','i','z'])_
+    Generate image lists for the requested coordinates or object.
+       * _obj_: _string_, Name of the requested object or coordinate pair. ex.: "m31", "180.24, 52.18".
+       * _width_: _float_, Width of the requested frame in degrees. ex.: 1.2.
+       * _height_: _float_, Height of the requested frame in degrees. ex.: 1.2.	
+       * _survey_: _string_, optional, Name of the survey. One of "SDSS", "DSS", "2MASS", "DPOSS".
+       * _band_: _list_, optional, List of the filter names in which images are to be obtained. A list of all filters for all surveys is given here.
+          * SDSS: u, g, r, i, z
+          * 2MASS: j, h, k
+          * DPOSS: f, j, n
+          * DSS: DSS1, DSS1R, DSS1B, DSS2, DSS2B, DSS2R, DSS2IR
+
 
 ####Getting the code working:
 The main script should do all the steps required for getting a pixel-level implementation of photometric redshift estimation running. 
