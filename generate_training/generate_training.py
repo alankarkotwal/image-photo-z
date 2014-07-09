@@ -161,8 +161,10 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 				if catalog[int(i.split()[0])-1].split(',')[6] == catagory:
 					redshift=float(catalog[int(i.split()[0])-1].split(',')[4])
 					redshiftError=float(catalog[int(i.split()[0])-1].split(',')[5])
-					pixelRA=float(catalog[int(i.split()[0])-1].split(',')[2])
-					pixelDec=float(catalog[int(i.split()[0])-1].split(',')[3])
+					hdulist = fits.open(imageFileNames[0])
+					#pixelRA=float(catalog[int(i.split()[0])-1].split(',')[2])
+					#pixelDec=float(catalog[int(i.split()[0])-1].split(',')[3])
+					w = wcs.WCS(hdulist[0].header)
 					if catagory=="GALAXY":
 						objClass=1.0
 					elif catagory=="STAR":
@@ -203,6 +205,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 									trainingVector.append(redshift)
 									trainingVector.append(redshiftError)
 									trainingVector.append(objClass)
+									pixelRA, pixelDec = w.wcs_pix2world(float(j), float(k), 1)
 									trainingVector.append(pixelRA)
 									trainingVector.append(pixelDec)
 									trainingArray.append(trainingVector)
