@@ -60,8 +60,11 @@ try:
 			pass
 
 		preprocess_catalog(configOptions['TRAINING_CATALOG'], configOptions['TRAINING_CATALOG_PROCESSED'])
-
-		download_images(configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['TRAINING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
+		
+		if configOptions['LOCAL_IMAGES']=='yes':
+			pass
+		else:
+			download_images(configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['TRAINING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
 		if configOptions['LOG_INDEPENDENTLY']=='yes':
 			make_logfile(configOptions['TRAINING_CATALOG_PROCESSED'])
 
