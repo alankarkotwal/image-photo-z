@@ -98,7 +98,11 @@ try:
 			if configOptions['USE_BACKGROUND']=='yes':
 				print "BACKGROUND"
 				generate_training_background(seg_image_list, images_list, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-			os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
+				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			else:
+				for band in bands:
+					os.system("mv "+configOptions['PROCESSING_DIR']+" "+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 
@@ -118,7 +122,10 @@ try:
 
 		preprocess_catalog(configOptions['TESTING_CATALOG'], configOptions['TESTING_CATALOG_PROCESSED'])
 
-		download_images(configOptions['TESTING_CATALOG_PROCESSED'], configOptions['TESTING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
+		if configOptions['LOCAL_IMAGES']=='yes':
+			pass
+		else:
+			download_images(configOptions['TESTING_CATALOG_PROCESSED'], configOptions['TESTING_IMAGES_DIR'], logfile=configOptions['LOGFILE'])
 		if configOptions['LOG_INDEPENDENTLY']=='yes':
 			make_logfile(configOptions['TESTING_CATALOG_PROCESSED'])
 
@@ -152,7 +159,11 @@ try:
 			if configOptions['USE_BACKGROUND']=='yes':	
 				print "BACKGROUND"
 				generate_training_background(seg_image_list, images_list, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-			os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
+				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
+			else:
+				for band in bands:
+					os.system("mv "+configOptions['PROCESSING_DIR']+" "+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TESTING_FILES'])
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 				
