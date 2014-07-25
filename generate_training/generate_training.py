@@ -174,6 +174,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					segImageList=fits.open(segImageName)
 					segImage=segImageList[0].data
 					thisObjFlag=int(segImage[int(i.split()[2])][int(i.split()[1])])
+					thisObjX=int(i.split()[2])
+					thisObjY=int(i.split()[1])
 					fitsFiles=[]
 					fitsImages=[]
 					k=0
@@ -191,6 +193,18 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					trainingArray[0].append("Class")
 					trainingArray[0].append("PixelRA")
 					trainingArray[0].append("PixelDec")
+					trainingArray[0].append("DistanceFromCenter")
+					maxDist=1
+					for j in range(max(0,int(i.split()[3])), min(int(i.split()[4]),segImage.shape[0]-1)):
+						for k in range(max(0,int(i.split()[5])), min(int(i.split()[6]),segImage.shape[1]-1)):
+							isPixelValid=1
+							for l in fitsImages:
+								if math.isnan(float(l[k][j])):
+									isPixelValid=0
+							if isPixelValid==1:
+								if segImage[k][j]==thisObjFlag:
+									maxDist=max(maxDist, math.sqrt(pow((k-thisObjX),2)+pow((j-thisObjY),2)))
+					
 					for j in range(max(0,int(i.split()[3])), min(int(i.split()[4]),segImage.shape[0]-1)):
 						for k in range(max(0,int(i.split()[5])), min(int(i.split()[6]),segImage.shape[1]-1)):
 							isPixelValid=1
@@ -208,6 +222,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 									pixelRA, pixelDec = w.wcs_pix2world(float(j), float(k), 1)
 									trainingVector.append(pixelRA)
 									trainingVector.append(pixelDec)
+									distance=math.sqrt(pow((k-thisObjX),2)+pow((j-thisObjY),2))/maxDist
+									trainingVector.append(distance)
 									trainingArray.append(trainingVector)
 								
 				

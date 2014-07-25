@@ -101,8 +101,12 @@ try:
 			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
 				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
 			else:
+				try:
+					os.mkdir(configOptions['INTERMEDIATE_TRAINING_FILES'])
+				except OSError:
+					pass
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+" "+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
+					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 
@@ -162,8 +166,12 @@ try:
 			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
 				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
 			else:
+				try:
+					os.mkdir(configOptions['INTERMEDIATE_TESTING_FILES'])
+				except OSError:
+					pass
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+" "+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TESTING_FILES'])
+					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TESTING_FILES'])
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 				
@@ -176,7 +184,7 @@ try:
 				prepare_for_training_kNN_regression(catagories, configOptions['TRAINING_CLASSIFIED_DATA_DIR'], [configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE']])
 				prepare_for_training_kNN_regression(catagories, configOptions['TESTING_CLASSIFIED_DATA_DIR'], [configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE']])
 				train_test_kNN_regression(configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE'], configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['TESTING_PREDICTION_FILE'], int(configOptions['NUMBER_NEIGHBORS']))
-				generate_kNN_output(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
+				generate_kNN_output_regression(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
 			elif configOptions['PROBLEM_TYPE']=='classification':
 				prepare_for_training_kNN_classification(catagories, configOptions['TRAINING_CLASSIFIED_DATA_DIR'], [configOptions['TRAINING_DATA_FILE'], configOptions['TRAINING_TARGET_FILE']])
 				prepare_for_training_kNN_classification(catagories, configOptions['TESTING_CLASSIFIED_DATA_DIR'], [configOptions['TESTING_DATA_FILE'], configOptions['TESTING_TARGET_FILE']])

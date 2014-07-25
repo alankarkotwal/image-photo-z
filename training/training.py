@@ -76,9 +76,8 @@ def prepare_for_training_kNN_regression(catagories, dataDir, outfiles):
 				 	entryFields=j.split()
 				 	for k in range(5):
 				 		outputFileData.write(entryFields[k])
-				 		if k!=4:
-				 			outputFileData.write(" ")
-				 	outputFileData.write("\n")
+				 		outputFileData.write(" ")
+				 	outputFileData.write(entryFields[10]+'\n')
 				 	outputFileTarget.write(entryFields[5]+'\n')
 			
 			objfile.close()	
@@ -213,9 +212,8 @@ def prepare_for_training_kNN_classification(catagories, dataDir, outfiles):
 					entryFields=j.split()
 					for k in range(5):
 						outputFileData.write(entryFields[k])
-						if k!=4:
-							outputFileData.write(" ")
-					outputFileData.write("\n")
+						outputFileData.write(" ")
+					outputFileData.write(entryFields[10]+'\n')
 					outputFileTarget.write(str(objno)+" ")
 					outputFileTarget.write(entryFields[7]+'\n')
 			
@@ -246,31 +244,33 @@ def train_test_kNN_classification(trainData, trainTargets, testData, testTargets
 	trainData=[]
 	testData=[]
 	targets=[]
+	distances=[]
 
 	for i in range(len(trainDataLines)):
 		isEntryValid=1
 		vec=trainDataLines[i].split()
-		for j in range(len(vec)):
+		for j in range(len(vec)-1):
 			if math.isnan(float(vec[j])):
 				isEntryValid=0
 				break
 			vec[j]=float(vec[j].rstrip())
 		if isEntryValid==1:
-			trainData.append(vec)
+			trainData.append(vec[:len(vec)-1])
 			targets.append(float(targetFileLines[i].split()[1].rstrip()))
 	
 
 	for i in range(len(testDataLines)):
 		isEntryValid=1
 		vec=testDataLines[i].split()
-		for j in range(len(vec)):
+		for j in range(len(vec)-1):
 			if math.isnan(float(vec[j])):
 				isEntryValid=0
 				break
 			vec[j]=float(vec[j])
 		if isEntryValid==1:
-			testData.append(vec)
+			testData.append(vec[:len(vec)-1])
 			testTargetFile.write(testTargetLines[i])
+			distances.append(vec[len(vec)-1])
 		
 	trainArray=np.asarray(trainData)
 	testArray=np.asarray(testData)
@@ -282,9 +282,10 @@ def train_test_kNN_classification(trainData, trainTargets, testData, testTargets
 	classifier=kNNC(n_neighbors=nNeighbors)
 	classifier.fit(trainArrayScaled, targetArray)
 	
-	for i in testArrayScaled:
-		prediction=classifier.predict(i)
-		predFile.write(str(prediction[0])+'\n')
+	for i in range(len(testArrayScaled)):
+		prediction=classifier.predict(testArrayScaled[i])
+		predFile.write(str(prediction[0])+' ')
+		predFile.write(str(distances[i])+'\n')
 		
 	trainDataFile.close()
 	testDataFile.close()
@@ -302,14 +303,14 @@ def generate_kNN_output_classification(testingPredictions, testingTargets, outfi
 	testTargets=testTargFile.readlines()
 	
 	nPixels=1	
-	totalZ=float(testPreds[0].rstrip())
+	totalZ=float(testPreds[0].rstrip().split()[0])
 	
 	i=1
 	
 	while i<len(testPreds):
 		while i<len(testPreds) and float(testTargets[i].split()[0].rstrip())==float(testTargets[i-1].split()[0].rstrip()):
 			nPixels=nPixels+1
-			totalZ=totalZ+float(testPreds[i].rstrip())
+			totalZ=totalZ+float(testPreds[i].rstrip().split()[0])
 			i=i+1
 			if i==len(testPreds):
 				break
@@ -320,7 +321,7 @@ def generate_kNN_output_classification(testingPredictions, testingTargets, outfi
 		if i==len(testPreds):
 			break
 		nPixels=1
-		totalZ=float(testPreds[i].rstrip())
+		totalZ=float(testPreds[i].rstrip().split()[0])
 		i=i+1
 	
 	testPredFile.close()
