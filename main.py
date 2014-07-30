@@ -94,9 +94,6 @@ try:
 				sexConfigFiles.append(band+".sex")
 
 			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
-			print "loop"
-			while 1:
-				pass
 			convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
 			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
 			for catagory in catagories:
