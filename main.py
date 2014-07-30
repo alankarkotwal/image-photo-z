@@ -78,6 +78,8 @@ try:
 			os.system("cp "+configOptions['TRAINING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
 			list_in=[]
 			images_list=[]
+			int_error_image_list=[]
+			error_image_list=[]
 			sex_image_list=[]
 			seg_image_list=[]
 			sexConfigFiles=[]
@@ -85,11 +87,16 @@ try:
 			for band in bands:
 				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
 				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
+				int_error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error_int.fits")
+				error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits")
 				sex_image_list.append(iden+"-"+band+"_reg.fits")
 				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
 				sexConfigFiles.append(band+".sex")
 
-			register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
+			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
+			print "loop"
+			while 1:
+				pass
 			convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
 			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
 			for catagory in catagories:
@@ -106,7 +113,8 @@ try:
 				except OSError:
 					pass
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
+					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
+					os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 
@@ -145,16 +153,20 @@ try:
 			images_list=[]
 			sex_image_list=[]
 			seg_image_list=[]
+			int_error_image_list=[]
+			error_image_list=[]
 			sexConfigFiles=[]
 			ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
 			for band in bands:
 				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
 				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
+				int_error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error_int.fits")
+				error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits")
 				sex_image_list.append(iden+"-"+band+"_reg.fits")
 				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
 				sexConfigFiles.append(band+".sex")
 
-			register_reproject(list_in, images_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
+			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
 			convert_catalog_to_exp_pixels(ref_image, configOptions['TESTING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
 			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
 			for catagory in catagories:
@@ -171,7 +183,8 @@ try:
 				except OSError:
 					pass
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['INTERMEDIATE_TESTING_FILES'])
+					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
+					os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
 			if configOptions['TIME']=='yes':
 				print (time.time()-start)/60
 				
