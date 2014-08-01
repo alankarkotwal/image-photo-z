@@ -34,19 +34,14 @@ def prepare_for_training_MLZ(catagories, dataDir, outfile): # Applies to both te
 		listfile.close()
 					 	
 	outputFile.close()
+	
+
+def generate_input_file(trainingData, testingData):
+	pass
 
 
-def train_MLZ(algorithm, predClass, trainingFileName, testingFileName, testDataPath, inputfileTemplateName, inputFileName, nCores=4):
-	# Under construction
-	inputfileTemplate=open(inputfileTemplateName,"r")
-	inputTemplateLines=inputfileTemplate.readlines()
-	inputfileTemplate.close()
-	
-	inputfile=open(inputFileName,"w")
-	
-	inputfile.close()
-	
-	os.system("mpirun -n "+nCores+" runMLZ "+testDataPath+inputFileName)
+def train_MLZ(inputFileName, nCores=4):	
+	os.system("mpirun -n "+nCores+" runMLZ "+inputFileName)
 
 
 #****

@@ -135,7 +135,7 @@ def sextract(imageFileNames, configFileNames, processDir, refBand='r', bands=['u
 	os.chdir(currDir)
 
 
-def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, catagory, outdir):
+def generate_training_objects(objectsFileName, segImageName, catalog, imageFileNames, errorFileNames, catagory, outdir):
 	if catagory not in ["GALAXY", "STAR", "QSO"]:
 		print "Argument catagory must be one of GALAXY, STAR and QSO."
 		return -1
@@ -153,7 +153,7 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 		catalog=catalogFile.readlines()
 		
 		outlist=open(outdir+"/"+catagory+"/"+catagory+".list","a")
-	
+		
 		for i in objects:
 			if i[0] is '#' or None:
 				pass
@@ -178,6 +178,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					thisObjY=int(i.split()[1])
 					fitsFiles=[]
 					fitsImages=[]
+					fitsErrorFiles=[]
+					fitsErrors=[]
 					k=0
 					trainingArray=[[]]
 					for j in imageFileNames:
@@ -194,6 +196,12 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 					trainingArray[0].append("PixelRA")
 					trainingArray[0].append("PixelDec")
 					trainingArray[0].append("DistanceFromCenter")
+					k=0
+					for j in errorFileNames:
+						fitsErrorFiles.append(fits.open(j))
+						fitsErrors.append(fitsErrorFiles[k][0].data)
+						trainingArray[0].append(j+"FluxError")
+						k=k+1
 					maxDist=1
 					for j in range(max(0,int(i.split()[3])), min(int(i.split()[4]),segImage.shape[0]-1)):
 						for k in range(max(0,int(i.split()[5])), min(int(i.split()[6]),segImage.shape[1]-1)):
@@ -224,6 +232,8 @@ def generate_training_objects(objectsFileName, segImageName, catalog, imageFileN
 									trainingVector.append(pixelDec)
 									distance=math.sqrt(pow((k-thisObjX),2)+pow((j-thisObjY),2))/maxDist
 									trainingVector.append(distance)
+									for l in fitsErrors:
+										trainingVector.append(float(l[k][j]))
 									trainingArray.append(trainingVector)
 								
 				

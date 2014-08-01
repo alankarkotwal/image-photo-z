@@ -43,7 +43,7 @@ def return_sdss_darkVariance(band, camcol, run):
 
 def return_sdss_pixelError(band, camcol, run, img, simg, cimg):
 	dn=img/cimg+simg
-	dn_err=math.sqrt((dn/return_sdss_gain(band, camcol, run))+return_sdss_darkVariance(band, camcol, run))
+	dn_err=math.sqrt(abs((dn/return_sdss_gain(band, camcol, run))+return_sdss_darkVariance(band, camcol, run)))
 	img_err=dn_err*cimg
 	return img_err
 

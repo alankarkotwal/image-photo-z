@@ -48,6 +48,7 @@ from training import *
 try:
 	if configOptions['REGENERATE_PIXEL_DATA']=='yes':
 		try:
+			os.system("rm -rf "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.hdr ")
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/GALAXY")
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/STAR")
@@ -92,13 +93,12 @@ try:
 				sex_image_list.append(iden+"-"+band+"_reg.fits")
 				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
 				sexConfigFiles.append(band+".sex")
-
 			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
 			convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
 			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
 			for catagory in catagories:
 				print catagory
-				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TRAINING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
+				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TRAINING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
 			if configOptions['USE_BACKGROUND']=='yes':
 				print "BACKGROUND"
 				generate_training_background(seg_image_list, images_list, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
@@ -168,7 +168,7 @@ try:
 			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
 			for catagory in catagories:
 				print catagory
-				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TESTING_CATALOG_PROCESSED'], images_list, catagory, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
+				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TESTING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
 			if configOptions['USE_BACKGROUND']=='yes':	
 				print "BACKGROUND"
 				generate_training_background(seg_image_list, images_list, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
@@ -204,6 +204,9 @@ try:
 				else:
 					generate_kNN_output_classification(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
 		elif configOptions['ALGORITHM']=='MLZ':
+			#prepare_for_training_MLZ(catagories, dataDir, outfile)
+			#generate_input_file(trainingData, testingData)
+			#train_MLZ(inputFileName, nCores=4)
 			pass # To be written
 
 	if configOptions['CLEAN_AFTER_DONE']=='yes':
