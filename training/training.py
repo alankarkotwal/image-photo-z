@@ -65,7 +65,7 @@ def generate_input_file(inputFileTemplateName, inputFileName, trainingData, test
 		inputOptions['Path_Test']='/'.join(tempList[:len(tempList)-1])+'/'
 	else:
 		inputOptions['Path_Test']="./"
-	tempList=testingData.split('/')
+	tempList=outputFile.split('/')
 	inputOptions['FinalFileName']=tempList[len(tempList)-1]
 	if len(tempList)>1:
 		inputOptions['Path_Output']='/'.join(tempList[:len(tempList)-1])+'/'

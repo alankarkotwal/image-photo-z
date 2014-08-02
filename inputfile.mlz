@@ -14,7 +14,7 @@ Ntop : 15
 WriteFits : no
 NAtt : 3
 SparseRep : yes
-FinalFileName : testingData.train
+FinalFileName : results.mlz
 NumberBases : 20
 SigmaFactor : 3.0
 TestFile : testingData.train
@@ -32,7 +32,7 @@ Att : u,g,r,i,z,zs,ezs,eu,eg,er,ei,ez
 Periodic : yes
 Columns_Test : u,g,r,i,z,zs,ezs,class,ra,dec,distance,eu,eg,er,ei,ez
 AlphaEnd : 0.5
-Path_Output : training/
+Path_Output : ./
 MinZ : 0.001
 NRandom : 1
 Iterations : 200
