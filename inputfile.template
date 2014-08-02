@@ -1,9 +1,12 @@
+TrainFile        : trainingData.train
+TestFile         : testingData.train
+FinalFileName    : results
 Path_Train       : ./
 Path_Test        : ./
 Path_Output      : ./
-Columns          : u,g,r,i,z,zs,ezs
-Att              : u,g,r,i,z,zs,ezs
-Columns_Test     : u,g,r,i,z,zs,ezs
+Columns          : u,g,r,i,z,zs,ezs,class,ra,dec,distance,eu,eg,er,ei,ez
+Att              : u,g,r,i,z,zs,ezs,eu,eg,er,ei,ez
+Columns_Test     : u,g,r,i,z,zs,ezs,class,ra,dec,distance,eu,eg,er,ei,ez
 KeyAtt           : zs
 CheckOnly        : no
 PredictionMode   : TPZ
@@ -13,7 +16,7 @@ MaxZ             : 2.0
 NzBins           : 80
 NRandom          : 2
 NTrees           : 4
-Natt             : 3
+NAtt             : 3
 OobError         : no
 VarImportance    : no
 MinLeaf          : 5

@@ -204,10 +204,14 @@ try:
 				else:
 					generate_kNN_output_classification(configOptions['TESTING_PREDICTION_FILE'], configOptions['TESTING_TARGET_FILE'], configOptions['KNN_OUTPUT_FILE'])
 		elif configOptions['ALGORITHM']=='MLZ':
-			#prepare_for_training_MLZ(catagories, dataDir, outfile)
-			#generate_input_file(trainingData, testingData)
-			#train_MLZ(inputFileName, nCores=4)
-			pass # To be written
+			prepare_for_training_MLZ(catagories, configOptions['TRAINING_CLASSIFIED_DATA_DIR'], configOptions['TRAINING_DATA_FILE'])
+			prepare_for_training_MLZ(catagories, configOptions['TESTING_CLASSIFIED_DATA_DIR'], configOptions['TESTING_DATA_FILE'])
+			if configOptions['PROBLEM_TYPE']=='regression':
+				predClass="Reg"
+			elif configOptions['PROBLEM_TYPE']=='classification':
+				predClass="Class"
+			generate_input_file("inputfile.template", configOptions['MLZ_INPUTFILE'], configOptions['TRAINING_DATA_FILE'], configOptions['TESTING_DATA_FILE'], configOptions['MLZ_OUTPUT_FILE'], configOptions['MLZ_CHECK_ONLY'], configOptions['MLZ_PREDICTION_MODE'], predClass, configOptions['MLZ_MIN_Z'], configOptions['MLZ_MAX_Z'], configOptions['MLZ_NZBINS'], configOptions['MLZ_NRANDOM'], configOptions['MLZ_NTREES'], configOptions['MLZ_NATT'], configOptions['MLZ_OOBERROR'], configOptions['MLZ_VARIMPORTANCE'], configOptions['MLZ_MINLEAF'])
+			train_MLZ(configOptions['MLZ_INPUTFILE'], nCores=4)
 
 	if configOptions['CLEAN_AFTER_DONE']=='yes':
 		os.system("rm -rf "+configOptions['PROCESSING_DIR'])

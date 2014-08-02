@@ -36,12 +36,66 @@ def prepare_for_training_MLZ(catagories, dataDir, outfile): # Applies to both te
 	outputFile.close()
 	
 
-def generate_input_file(trainingData, testingData):
-	pass
-
+def generate_input_file(inputFileTemplateName, inputFileName, trainingData, testingData, outputFile, check_only, predictionMode, predictionClass, minz, maxz, nzbins, nrandom, ntrees, natt, ooberror, varimportance, minleaf):
+	inputFileTemplate=open(inputFileTemplateName,"r")
+	inputTemplateLines=inputFileTemplate.readlines()
+	inputFileTemplate.close()
+	
+	inputFile=open(inputFileName,"w")
+	
+	inputOptions={}
+	for line in inputTemplateLines:
+		if line[0]=='#' or line[0]=='\n':
+			pass
+		else:
+			try:
+				inputOptions[line.split()[0]]=line.split()[2].rstrip()
+			except IndexError:
+				pass
+	
+	tempList=trainingData.split('/')
+	inputOptions['TrainFile']=tempList[len(tempList)-1]
+	if len(tempList)>1:
+		inputOptions['Path_Train']='/'.join(tempList[:len(tempList)-1])+'/'
+	else:
+		inputOptions['Path_Train']="./"
+	tempList=testingData.split('/')
+	inputOptions['TestFile']=tempList[len(tempList)-1]
+	if len(tempList)>1:
+		inputOptions['Path_Test']='/'.join(tempList[:len(tempList)-1])+'/'
+	else:
+		inputOptions['Path_Test']="./"
+	tempList=testingData.split('/')
+	inputOptions['FinalFileName']=tempList[len(tempList)-1]
+	if len(tempList)>1:
+		inputOptions['Path_Output']='/'.join(tempList[:len(tempList)-1])+'/'
+	else:
+		inputOptions['Path_Output']="./"
+	inputOptions['CheckOnly']=check_only
+	inputOptions['PredictionMode']=predictionMode
+	inputOptions['PredictionClass']=predictionClass
+	inputOptions['MinZ']=minz
+	inputOptions['MaxZ']=maxz
+	inputOptions['NzBins']=nzbins
+	inputOptions['NRandom']=nrandom
+	inputOptions['NTrees']=ntrees
+	inputOptions['NAtt']=natt 
+	inputOptions['OobError']=ooberror
+	inputOptions['VarImportance']=varimportance
+	inputOptions['MinLeaf']=minleaf
+	
+	keysList=inputOptions.keys()
+	for key in keysList:
+		inputFile.write(key)
+		inputFile.write(" : ")
+		inputFile.write(inputOptions[key])
+		inputFile.write("\n")
+	
+	inputFile.close()
+	
 
 def train_MLZ(inputFileName, nCores=4):	
-	os.system("mpirun -n "+nCores+" runMLZ "+inputFileName)
+	os.system("mpirun -n "+str(nCores)+" runMLZ "+inputFileName)
 
 
 #****
