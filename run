@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source config.cfg
+mpirun -np $N_PROCESSORS ./main.py

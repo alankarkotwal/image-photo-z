@@ -52,7 +52,7 @@ def register_reproject_with_errors(inputImages, outputImages, intErrorImages, ou
 	cmds.mGetHdr(refImage,headerName)
 	mw.reproject(inputImages,outputImages,header=headerName,north_aligned=True,system='EQUJ',exact_size=True,common=True,silent_cleanup=True)
 	for i in range(len(inputImages)):
-		idenList=inputImages[i].split('/')[1].split('-')
+		idenList=inputImages[i].split('/')[2].split('-')
 		run=int(idenList[0])
 		camcol=int(idenList[1])
 		field=int(idenList[2])
