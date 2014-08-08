@@ -15,6 +15,9 @@ _Pixel-level estimation of photometric redshifts for astronomical images._
   * MLZ from LCDM and its dependencies
   * Scikit-Learn
 
+####Usage Instructions:
+Write something here
+
 ####Install Instructions:  
 The setup-* scripts take care of the installation of the package.  
 Install dependencies first by running the setup-deps script this way:
@@ -28,7 +31,7 @@ Install the package by running
     sudo chmod +x setup.sh
     ./setup.sh
 
-####Instructions For Use: 
+####API Reference: 
 
 
 A. *catalog_gen* module: This module implements querying the SDSS SkyServer for a catalog of objects that image-photo-z may use.
