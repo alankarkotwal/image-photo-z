@@ -23,6 +23,12 @@ for line in configLines:
 		except IndexError:
 			pass
 
+if configOptions['USE_MPI']=='yes':
+	try:
+		from mpi4py import MPI as m
+	except ImportError:
+		configOptions['USE_MPI']=='no'
+
 catagories=[]
 if configOptions['USE_GALAXIES']=='yes':
 	catagories.append("GALAXY")
@@ -45,17 +51,21 @@ from training import *
 #os.system("rm -rf data/ data_test/")
 
 #start=time.time()
+
+os.system("rm -rf "+configOptions['PROCESSING_DIR'])
+
 try:
 	if configOptions['REGENERATE_PIXEL_DATA']=='yes':
 		try:
-			os.system("rm -rf "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.hdr ")
+			os.mkdir(configOptions['PROCESSING_DIR'])
+			for i in range(int(configOptions['N_PROCESSORS'])):
+				os.mkdir(configOptions['PROCESSING_DIR']+"/"+str(i))
+				os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR']+"/"+str(i))
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/GALAXY")
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/STAR")
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/QSO")
 			os.mkdir(configOptions['TRAINING_CLASSIFIED_DATA_DIR']+"/BACKGROUND")
-			os.mkdir(configOptions['PROCESSING_DIR'])
-			os.system("cp "+configOptions['IMAGE_PHOTOZ_PATH']+"/generate_training/default_sextr_config/* "+configOptions['PROCESSING_DIR'])
 			os.mkdir(configOptions['TRAINING_IMAGES_DIR'])
 		except OSError:
 			pass
@@ -72,49 +82,68 @@ try:
 		logfile=open(configOptions['LOGFILE'], "r")
 		logfileLines=logfile.readlines()
 		logfile.close()
-
-		for i in logfileLines:
-			iden=i.rstrip()
-			print iden
-			os.system("cp "+configOptions['TRAINING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
-			list_in=[]
-			images_list=[]
-			int_error_image_list=[]
-			error_image_list=[]
-			sex_image_list=[]
-			seg_image_list=[]
-			sexConfigFiles=[]
-			ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
-			for band in bands:
-				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
-				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
-				int_error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error_int.fits")
-				error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits")
-				sex_image_list.append(iden+"-"+band+"_reg.fits")
-				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
-				sexConfigFiles.append(band+".sex")
-			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
-			convert_catalog_to_exp_pixels(ref_image, configOptions['TRAINING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
-			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
-			for catagory in catagories:
-				print catagory
-				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TRAINING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-			if configOptions['USE_BACKGROUND']=='yes':
-				print "BACKGROUND"
-				generate_training_background(seg_image_list, images_list, configOptions['TRAINING_CLASSIFIED_DATA_DIR'])
-			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
-				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-			else:
-				try:
-					os.mkdir(configOptions['INTERMEDIATE_TRAINING_FILES'])
-				except OSError:
-					pass
+		
+		def generate_training_data(argsList): # args is a list [iden, configOptions, jobID]
+			for args in argsList:
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
-					os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-			if configOptions['TIME']=='yes':
-				print (time.time()-start)/60
+					os.system("cp "+args[1]['TRAINING_IMAGES_DIR']+"/"+args[0]+"-"+band+".fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2]))
+				list_in=[]
+				images_list=[]
+				int_error_image_list=[]
+				error_image_list=[]
+				sex_image_list=[]
+				seg_image_list=[]
+				sexConfigFiles=[]
+				ref_image=args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-r.fits"
+				for band in bands:
+					list_in.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+".fits")
+					images_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_reg.fits")
+					int_error_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error_int.fits")
+					error_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error.fits")
+					sex_image_list.append(args[0]+"-"+band+"_reg.fits")
+					seg_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+band+"_seg.fits")
+					sexConfigFiles.append(band+".sex")
+				register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/", headerName=args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+".hdr")
+				convert_catalog_to_exp_pixels(ref_image, args[1]['TRAINING_CATALOG_PROCESSED'], args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/sky.list")
+				sextract(sex_image_list, sexConfigFiles, args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/")
+				for catagory in catagories:
+					#print catagory
+					generate_training_objects(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/ref.cat", args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/ref.fits", args[1]['TRAINING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, args[1]['TRAINING_CLASSIFIED_DATA_DIR'])
+				if args[1]['USE_BACKGROUND']=='yes':
+					#print "BACKGROUND"
+					generate_training_background(seg_image_list, images_list, args[1]['TRAINING_CLASSIFIED_DATA_DIR'])
+				if args[1]['REMOVE_INTERMEDIATE_IMAGES']=='yes':
+					os.system("rm "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.cat "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.hdr "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.list")
+				else:
+					try:
+						os.mkdir(args[1]['INTERMEDIATE_TRAINING_FILES'])
+					except OSError:
+						pass
+					for band in bands:
+						os.system("mv "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_reg.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error.fits "+args[1]['INTERMEDIATE_TRAINING_FILES'])
+						os.system("rm "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.cat "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.hdr "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.list")
+				if args[1]['TIME']=='yes':
+					print (time.time()-start)/60
+				pass
 
+		logfileLinesSplit=[]
+		length=len(logfileLines)
+		proc=int(configOptions['N_PROCESSORS'])
+		for i in range(proc):
+			logfileLinesSplit.append(logfileLines[(i*length/proc):((i+1)*length/proc)])
+		
+		argsList=[]
+		for i in range(proc):
+			oneProcArg=[]
+			for j in logfileLinesSplit[i]:
+				oneProcOneArg=[j.rstrip(),configOptions,i]
+				oneProcArg.append(oneProcOneArg)
+			argsList.append(oneProcArg)
+
+		commTrain=m.COMM_WORLD
+		ids=commTrain.scatter(argsList, root=0)
+		generate_training_data(ids)
+		
 		#**************************
 		# Training has ended here.*
 		#**************************
@@ -142,48 +171,60 @@ try:
 		logfileLines=logfile.readlines()
 		logfile.close()
 
-		for i in logfileLines:
-			iden=i.rstrip()
-			print iden
-			os.system("cp "+configOptions['TESTING_IMAGES_DIR']+"/"+iden+"* "+configOptions['PROCESSING_DIR']+"/")
-			list_in=[]
-			images_list=[]
-			sex_image_list=[]
-			seg_image_list=[]
-			int_error_image_list=[]
-			error_image_list=[]
-			sexConfigFiles=[]
-			ref_image=configOptions['PROCESSING_DIR']+"/"+iden+"-r.fits"
-			for band in bands:
-				list_in.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+".fits")
-				images_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits")
-				int_error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error_int.fits")
-				error_image_list.append(configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits")
-				sex_image_list.append(iden+"-"+band+"_reg.fits")
-				seg_image_list.append(configOptions['PROCESSING_DIR']+"/"+band+"_seg.fits")
-				sexConfigFiles.append(band+".sex")
-
-			register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, configOptions['PROCESSING_DIR'], headerName=configOptions['PROCESSING_DIR']+"/"+iden+".hdr")
-			convert_catalog_to_exp_pixels(ref_image, configOptions['TESTING_CATALOG_PROCESSED'], configOptions['PROCESSING_DIR']+"/sky.list")
-			sextract(sex_image_list, sexConfigFiles, configOptions['PROCESSING_DIR'])
-			for catagory in catagories:
-				print catagory
-				generate_training_objects(configOptions['PROCESSING_DIR']+"/ref.cat", configOptions['PROCESSING_DIR']+"/ref.fits", configOptions['TESTING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-			if configOptions['USE_BACKGROUND']=='yes':	
-				print "BACKGROUND"
-				generate_training_background(seg_image_list, images_list, configOptions['TESTING_CLASSIFIED_DATA_DIR'])
-			if configOptions['REMOVE_INTERMEDIATE_IMAGES']=='yes':
-				os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-			else:
-				try:
-					os.mkdir(configOptions['INTERMEDIATE_TESTING_FILES'])
-				except OSError:
-					pass
+		def generate_testing_data(argsList): # args is a list [iden, configOptions, jobID]
+			for args in argsList:
 				for band in bands:
-					os.system("mv "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_reg.fits "+configOptions['PROCESSING_DIR']+"/"+iden+"-"+band+"_error.fits "+configOptions['INTERMEDIATE_TRAINING_FILES'])
-					os.system("rm "+configOptions['PROCESSING_DIR']+"/*.fits "+configOptions['PROCESSING_DIR']+"/*.cat "+configOptions['PROCESSING_DIR']+"/*.hdr "+configOptions['PROCESSING_DIR']+"/*.list")
-			if configOptions['TIME']=='yes':
-				print (time.time()-start)/60
+					os.system("cp "+args[1]['TESTING_IMAGES_DIR']+"/"+args[0]+"-"+band+".fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2]))
+				list_in=[]
+				images_list=[]
+				int_error_image_list=[]
+				error_image_list=[]
+				sex_image_list=[]
+				seg_image_list=[]
+				sexConfigFiles=[]
+				ref_image=args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-r.fits"
+				for band in bands:
+					list_in.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+".fits")
+					images_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_reg.fits")
+					int_error_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error_int.fits")
+					error_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error.fits")
+					sex_image_list.append(args[0]+"-"+band+"_reg.fits")
+					seg_image_list.append(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+band+"_seg.fits")
+					sexConfigFiles.append(band+".sex")
+				register_reproject_with_errors(list_in, images_list, int_error_image_list, error_image_list, ref_image, args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/", headerName=args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+".hdr")
+				convert_catalog_to_exp_pixels(ref_image, args[1]['TESTING_CATALOG_PROCESSED'], args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/sky.list")
+				sextract(sex_image_list, sexConfigFiles, args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/")
+				for catagory in catagories:
+					#print catagory
+					generate_testing_objects(args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/ref.cat", args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/ref.fits", args[1]['TESTING_CATALOG_PROCESSED'], images_list, error_image_list, catagory, args[1]['TESTING_CLASSIFIED_DATA_DIR'])
+				if args[1]['USE_BACKGROUND']=='yes':
+					#print "BACKGROUND"
+					generate_testing_background(seg_image_list, images_list, args[1]['TESTING_CLASSIFIED_DATA_DIR'])
+				if args[1]['REMOVE_INTERMEDIATE_IMAGES']=='yes':
+					os.system("rm "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.cat "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.hdr "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.list")
+				else:
+					try:
+						os.mkdir(args[1]['INTERMEDIATE_TESTING_FILES'])
+					except OSError:
+						pass
+					for band in bands:
+						os.system("mv "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_reg.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/"+args[0]+"-"+band+"_error.fits "+args[1]['INTERMEDIATE_TESTING_FILES'])
+						os.system("rm "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.fits "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.cat "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.hdr "+args[1]['PROCESSING_DIR']+"/"+str(args[2])+"/*.list")
+				if args[1]['TIME']=='yes':
+					print (time.time()-start)/60
+				pass				
+			
+		argsList=[]
+		for i in range(proc):
+			oneProcArg=[]
+			for j in logfileLinesSplit[i]:
+				oneProcOneArg=[j.rstrip(),configOptions,i]
+				oneProcArg.append(oneProcOneArg)
+			argsList.append(oneProcArg)
+
+		commTest=m.COMM_WORLD
+		ids=commTest.scatter(argsList, root=0)
+		generate_testing_data(ids)
 				
 	if configOptions['USE_BACKGROUND']=='yes':
 		catagories.append("BACKGROUND")
