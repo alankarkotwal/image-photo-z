@@ -1,0 +1,88 @@
+# Configuration file for Image Photo-Z
+# Put no spaces between option and value. All directory names must have no '/' in the end. DO NOT comment out any line.
+
+# Path options. Specify the path to your installation folder here.
+IMAGE_PHOTOZ_PATH=/home/aloo/image-photo-z
+
+# Processing options
+USE_MPI=yes
+N_PROCESSORS=4
+
+# Catalog information.
+TRAINING_CATALOG=one_square_degree.csv
+TESTING_CATALOG=another_square_degree.csv
+TRAINING_CATALOG_PROCESSED=one_square_degree_processed.csv
+TESTING_CATALOG_PROCESSED=another_square_degree_processed.csv
+BANDS=u,g,r,i,z
+
+# Specify if the database is to be queried and the object list or the pixel data is to be regenerated.
+REMAKE_TRAINING_CATALOG=no
+REGENERATE_PIXEL_DATA=yes
+
+# Specify if the images log is to be generated independently of downloading.
+LOG_INDEPENDENTLY=yes
+LOGFILE=logfile
+
+# Give the training and testing images directory here. Set LOCAL_IMAGES to yes if you already have the images stored locally. Give the storage directory in that case.
+LOCAL_IMAGES=yes
+TRAINING_IMAGES_DIR=images
+TESTING_IMAGES_DIR=images_test
+
+# Give the path to the processing directory here.
+PROCESSING_DIR=processing
+
+# Name the classified training and testing data directories here.
+TRAINING_CLASSIFIED_DATA_DIR=data
+TESTING_CLASSIFIED_DATA_DIR=data_test
+
+# Specify the raw datafiles for training and testing. Only the data files will be used for MLZ.
+TRAINING_DATA_FILE=training/trainingData.train
+TRAINING_TARGET_FILE=training/trainingTargets.train
+TESTING_DATA_FILE=training/testingData.train
+TESTING_TARGET_FILE=training/testingTargets.train
+TESTING_PREDICTION_FILE=training/testingPredictions.train
+
+# Training options
+TRAIN_AND_TEST=no
+PROBLEM_TYPE=regression
+ALGORITHM=MLZ
+USE_GALAXIES=yes
+USE_STARS=yes
+USE_QSOS=yes
+USE_BACKGROUND=no
+
+# kNN options.
+NUMBER_NEIGHBORS=10
+KNN_OUTPUT_FILE=kNNOutput_regression.csv
+KNN_ROUND_OFF_CLASSIFICATION=no
+
+# MLZ options
+MLZ_INPUTFILE=inputfile.mlz
+MLZ_OUTPUT_FILE=results.mlz
+MLZ_CHECK_ONLY=no 
+MLZ_PREDICTION_MODE=TPZ 
+MLZ_MIN_Z=0.001 
+MLZ_MAX_Z=2.0
+MLZ_NZBINS=80 
+MLZ_NRANDOM=1 
+MLZ_NTREES=4
+MLZ_NATT=3
+MLZ_OOBERROR=no
+MLZ_VARIMPORTANCE=no 
+MLZ_MINLEAF=5
+
+# Exit options. Set CLEAN_AFTER_DONE to yes if you want to keep only the output file and the downloaded images after the code finishes.
+CLEAN_AFTER_DONE=no
+CLEAN_ON_INTERRUPT=no
+REMOVE_IMAGES_AFTER_DONE=no
+REMOVE_IMAGES_ON_INTERRUPT=no
+REMOVE_INTERMEDIATE_IMAGES=no
+
+# If the REMOVE_INTERMEDIATE_IMAGES is set to no, these are the directories where intermediate images will be stored.
+INTERMEDIATE_TRAINING_FILES=intermediate_training_images
+INTERMEDIATE_TESTING_FILES=intermediate_testing_images
+
+# Miscellaneous options
+TIME=no
+TIME_DETAIL=low
+TIME_FILE=timing.info
