@@ -13,4 +13,12 @@
 
 5) Port the code to run on a GPU.
 
-6) Add more stuff to this file.
+6) Automate generation of the catalog using sdssCL.
+
+7) Add timing support.
+
+8) Implement other machine learning algorithms.
+
+9) Check the validity of the interpolation used to "blow up" the sky image. Use other interpolations if more valid.
+
+10) Add more stuff to this file.
