@@ -21,4 +21,8 @@
 
 9) Check the validity of the interpolation used to "blow up" the sky image. Use other interpolations if more valid.
 
-10) Add more stuff to this file.
+10) Check how pixel redshifts are combined to form object redshifts. For now, we're doing direct averaging.
+
+11) Create a setup file or an installer to install the package in some standard location like dist-utils.
+
+12) Add more stuff to this file.
