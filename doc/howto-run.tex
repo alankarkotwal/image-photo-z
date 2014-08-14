@@ -1,0 +1,519 @@
+
+% Default to the notebook output style
+
+    
+
+
+% Inherit from the specified cell style.
+
+
+
+
+    
+\documentclass{article}
+
+    
+    
+    \usepackage{graphicx} % Used to insert images
+    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{color} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
+    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics 
+                         % to support a larger range 
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    
+
+    
+    
+    \definecolor{orange}{cmyk}{0,0.4,0.8,0.2}
+    \definecolor{darkorange}{rgb}{.71,0.21,0.01}
+    \definecolor{darkgreen}{rgb}{.12,.54,.11}
+    \definecolor{myteal}{rgb}{.26, .44, .56}
+    \definecolor{gray}{gray}{0.45}
+    \definecolor{lightgray}{gray}{.95}
+    \definecolor{mediumgray}{gray}{.8}
+    \definecolor{inputbackground}{rgb}{.95, .95, .85}
+    \definecolor{outputbackground}{rgb}{.95, .95, .95}
+    \definecolor{traceback}{rgb}{1, .95, .95}
+    % ansi colors
+    \definecolor{red}{rgb}{.6,0,0}
+    \definecolor{green}{rgb}{0,.65,0}
+    \definecolor{brown}{rgb}{0.6,0.6,0}
+    \definecolor{blue}{rgb}{0,.145,.698}
+    \definecolor{purple}{rgb}{.698,.145,.698}
+    \definecolor{cyan}{rgb}{0,.698,.698}
+    \definecolor{lightgray}{gray}{0.5}
+    
+    % bright ansi colors
+    \definecolor{darkgray}{gray}{0.25}
+    \definecolor{lightred}{rgb}{1.0,0.39,0.28}
+    \definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
+    \definecolor{lightblue}{rgb}{0.53,0.81,0.92}
+    \definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
+    \definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
+    
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+    
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatability definitions
+    \def\gt{>}
+    \def\lt{<}
+    % Document parameters
+    \title{howto-run}
+    
+    
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\def\PY@tok@gd{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\def\PY@tok@gu{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\def\PY@tok@gt{\def\PY@tc##1{\textcolor[rgb]{0.00,0.25,0.82}{##1}}}
+\def\PY@tok@gs{\let\PY@bf=\textbf}
+\def\PY@tok@gr{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\def\PY@tok@cm{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\def\PY@tok@vg{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\def\PY@tok@m{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@mh{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@go{\def\PY@tc##1{\textcolor[rgb]{0.50,0.50,0.50}{##1}}}
+\def\PY@tok@ge{\let\PY@it=\textit}
+\def\PY@tok@vc{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\def\PY@tok@il{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@cs{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\def\PY@tok@cp{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\def\PY@tok@gi{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\def\PY@tok@gh{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\def\PY@tok@ni{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\def\PY@tok@nl{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\def\PY@tok@nn{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\def\PY@tok@no{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\def\PY@tok@na{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\def\PY@tok@nb{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@nc{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\def\PY@tok@nd{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\def\PY@tok@ne{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\def\PY@tok@nf{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\def\PY@tok@si{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\def\PY@tok@s2{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@vi{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\def\PY@tok@nt{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@nv{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\def\PY@tok@s1{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@sh{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@sc{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@sx{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@bp{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@c1{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\def\PY@tok@kc{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@c{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\def\PY@tok@mf{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@err{\def\PY@bc##1{\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{##1}}}
+\def\PY@tok@kd{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@ss{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\def\PY@tok@sr{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\def\PY@tok@mo{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@kn{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@mi{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@gp{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\def\PY@tok@o{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\def\PY@tok@kr{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@s{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@kp{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@w{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\def\PY@tok@kt{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\def\PY@tok@ow{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\def\PY@tok@sb{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\def\PY@tok@k{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\def\PY@tok@se{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\def\PY@tok@sd{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy 
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=blue,
+      linkcolor=darkorange,
+      citecolor=darkgreen,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+    \begin{document}
+    
+    
+    \maketitle
+    
+    
+
+    
+    \section{A how-to to running image-photo-z}
+
+\begin{center}\rule{3in}{0.4pt}\end{center}
+
+\emph{A guide to installation and running the package with the main
+file}
+
+\subsection{Installation:}
+
+Installing the dependencies and cloning the repository is enough to set
+up the environment to run the package. For installing the dependencies,
+the setup-deps script provided in the root folder of the package should
+work on a system that can use apt-get. You need administrator
+priviledges to run this script. Run it as follows on the system shell.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}6}]:} \PY{n}{cd} \PY{n}{image}\PY{o}{-}\PY{n}{photo}\PY{o}{-}\PY{n}{z}\PY{o}{/}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+/home/aloo/image-photo-z
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{o}{.}\PY{o}{/}\PY{n}{setup}\PY{o}{-}\PY{n}{deps}\PY{o}{.}\PY{n}{sh}
+\end{Verbatim}
+
+    If for some reason you are not able to or do not wish to run the setup
+script, here is a list of dependencies (in order of their requirement
+for the pipeline) that need to be installed. Unless mentioned, it is
+best to install dependencies in their default locations using the
+standard installer provided or the standard package management for your
+system
+Python \textgreater{}= v2.7. python-dev, the development package, needs
+to be installed as well.
+Numpy \textgreater{}= v1.6.1
+Scipy \textgreater{}= v0.14.0
+Astropy \textgreater{}= v0.3.2
+Montage Image Mosaic Software \textgreater{}= v3.3. Best installed by
+downloading and compiling the source package with GNU Make.
+montage\_wrapper \textgreater{}= v0.9.7
+SExtractor \textgreater{}= v2.19.5. In my experience, gives trouble if
+installed via any source other than the rpm package on the Astromatic
+website.
+Scikit-learn \textgreater{}= v0.15.0b1
+MLZ \textgreater{}= v0.0.1, best installed via pip.
+The procedure for compiling source packages using make is the following,
+on the system shell:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{cd} \PY{p}{[}\PY{n}{package}\PY{o}{-}\PY{n}{name}\PY{p}{]}        \PY{c}{\PYZsh{} This is the root directory for the source package. }
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{cmake} \PY{o}{.} \PY{p}{[}\PY{n}{OR}\PY{p}{]} \PY{o}{.}\PY{o}{/}\PY{n}{configure} \PY{c}{\PYZsh{} This depends on the package. If it contains a configure file, use ./configure.}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{make}                     \PY{c}{\PYZsh{} This compiles the package.}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{sudo} \PY{n}{make} \PY{n}{install}        \PY{c}{\PYZsh{} Optional, need admin priviledges for this. Places binaries in their default positions.}
+\end{Verbatim}
+
+    For installing via rpm you need the rpm package management software.
+Once you have that, you do
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{sudo} \PY{n}{rpm} \PY{o}{-}\PY{n}{i} \PY{p}{[}\PY{n}{package}\PY{o}{-}\PY{n}{name}\PY{p}{]}\PY{o}{.}\PY{n}{rpm}
+\end{Verbatim}
+
+    Installing via pip is accomplished as follows:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{sudo} \PY{n}{pip} \PY{n}{install} \PY{p}{[}\PY{n}{package}\PY{o}{-}\PY{n}{name}\PY{p}{]}
+\end{Verbatim}
+
+    \subsection{Creating the config file}
+
+The config file is the set of input parameters to the code. Most
+parameter names are self-explanatory. Examples are provided in the
+config.cfg.template file provided in the root folder. They are explained
+here for completeness:\\For yes/no parameters, specify `yes' or `no'
+without the quotes. This is \textbf{case-sensitive}. For an explanation
+of what the files described below are, refer to the ``Getting to know
+the pipeline'' document.
+
+\begin{itemize}
+\item
+  IMAGE\_PHOTOZ\_PATH: This is the path to your local image-photo-z
+  installation. My value for this is /home/aloo/image-photo-z.
+\item
+  USE\_MPI: Set this to yes if you want to use MPI for the computation.
+\item
+  N\_PROCESSORS: Set this to the number of processors you want to use,
+  if using MPI.
+\item
+  TRAINING\_CATALOG: The object catalog file for training objects. This
+  file must be in a specified format as shown in the example catalog
+  file one\_square\_degree.csv provided with the package. For more
+  information on generating this file see the pipeline description.
+\item
+  TESTING\_CATALOG: The object catalog file for testing objects. This is
+  similar to the earlier file.
+\item
+  TRAINING\_CATALOG\_PROCESSED: The name of the processed catalog file
+  generated by the program.
+\item
+  TESTING\_CATALOG\_PROCESSED: The name of the processed catalog file
+  generated by the program.
+\item
+  BANDS: Filters to be used. Specify these as comma-separated without
+  spaces.
+\item
+  REMAKE\_CATALOGS: Specify whether or not to regenerate the catalogs by
+  querying the SDSS SAS.
+\item
+  REGENERATE\_PIXEL\_DATA: Specify whether or not to (re)generate pixel
+  data vectors.
+\item
+  LOG\_INDEPENDENTLY: Specify whether or not to generate a list
+  (logfile) of run-camcol-field combinations independent of image
+  downloading.
+\item
+  LOGFILE: Name of the logfile used to record run-camcol-field
+  combinations in the catalog.
+\item
+  LOCAL\_IMAGES: Specify if the images are stored locally or not.
+  Alternatively, select whether or not to download images (again).
+\item
+  TRAINING\_IMAGES\_DIR: If images are local, this is the directory in
+  which training images are stored. The images need to be stored as
+  {[}run{]}-{[}camcol{]}-{[}field{]}-{[}band{]}.fits (3813-5-24-u.fits,
+  for example) in this directory.
+\item
+  TESTING\_IMAGES\_DIR: Similar to the above for testing images.
+\item
+  PROCESSING\_DIR: The directory in which all processing is to be done.
+  Images per frame are moved into this directory, all data is extracted
+  from the images. Temporary files generated by the process are also
+  stored here.
+\item
+  TRAINING\_CLASSIFIED\_DATA\_DIR: The code generates classified
+  training data into this directory. Depending on which source types
+  (galaxies, stars, ..) are used, the data is stored in subfolders
+  inside this folder.
+\item
+  TESTING\_CLASSIFIED\_DATA\_DIR: Similar to the above, with testing
+  data.
+\item
+  TRAINING\_DATA\_FILE: Data collected from all sources is collected
+  into this file for training.
+\item
+  TESTING\_DATA\_FILE: Similar to the above for testing.
+\item
+  TRAINING\_TARGET\_FILE: If using kNN, the redshifts are stored in this
+  file before training.
+\item
+  TESTING\_TARGET\_FILE: Similar to the above, for testing.
+\item
+  TESTING\_PREDICTION\_FILE: If using kNN, immediately post testing, the
+  output for respective predictions are stored in this file.
+\item
+  TRAIN\_AND\_TEST: Enable or disable training and testing.
+\item
+  PROBLEM\_TYPE: Select whether you want to do classification or
+  regression.
+\item
+  USE\_GALAXIES: Enable or disable using galaxy pixels.
+\item
+  USE\_STARS: Enable or disable using star pixels.
+\item
+  USE\_QSOS: Enable or disable using QSO pixels.
+\item
+  USE\_BACKGROUND: Enable or disable using background pixels.
+\item
+  NUMBER\_NEIGHBORS: If using kNN, this sets the number of neighbors to
+  be used.
+\item
+  KNN\_OUTPUT\_FILE: If using kNN, this sets the final output filename
+  from which final plots may be generated.
+\item
+  KNN\_ROUND\_OFF\_CLASSIFICATION: If using kNN, this sets whether or
+  not to round off the classification result.
+\item
+  CLEAN\_AFTER\_DONE: Set to yes if only the output file and the
+  downloaded images are to be kept after the pipeline finishes.
+\item
+  CLEAN\_ON\_INTERRUPT: Set to yes if generated temporary files and data
+  is to be erased when the process is interrupted.
+\item
+  REMOVE\_IMAGES\_AFTER\_DONE: Set this to yes if images are to be
+  deleted after the program finishes.
+\item
+  REMOVE\_IMAGES\_ON\_INTERRUPT: Set this to yes if images are to be
+  deleted when the process is interrupted.
+\item
+  REMOVE\_INTERMEDIATE\_IMAGES: Set this to yes if intermediate images
+  (like registered and error images) are to be deleted or no if they are
+  to be moved to another location specified by
+  INTERMEDIATE\emph{*}FILES.
+\item
+  INTERMEDIATE\_TRAINING\_FILES: Directory to store intermediate files
+  if REMOVE\_INTERMEDIATE\_IMAGES is set to no.
+\item
+  TIME: Set whether or not to time the process. \emph{Not implemented
+  yet}.
+\item
+  TIME\_DETAIL: Select the level of timing detail required.
+\item
+  TIME\_FILE: File to dump timing information in.
+\end{itemize}
+Refer to MLZ documentation for the meaning of MLZ config options. These
+go straight to the MLZ inputfile.
+
+Note that in case of directories, do \textbf{NOT} put a `/' at the end
+of the parameter. The code does this automatically. Also, do
+\textbf{NOT} delete any entry from the config file, even if it is
+irrelevant to the configuration. This is done to prevent possible
+KeyErrors. Do \textbf{NOT} put spaces in any of the parameters.
+
+    \subsection{Running the pipeline:}
+
+Using the main file with an appropriate config file is the most
+straightforward way to run the pipeline end-to-end. Here, you have two
+options, depending on whether you want to or not to use MPI.
+
+This assumes you have the training and testing catalogs in the required
+format. Refer to the pipeline description for how to generate these.
+
+\begin{enumerate}[1)]
+\item
+  Not using MPI: If you cannot or do not wish to use MPI, the executable
+  main.py is to be run on the system shell, as follows:
+\end{enumerate}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}4}]:} \PY{n}{cd} \PY{n}{image}\PY{o}{-}\PY{n}{photo}\PY{o}{-}\PY{n}{z}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+/home/aloo/image-photo-z
+    \end{Verbatim}
+
+    Note that the path after the cd should be the path to \emph{your local
+image-photo-z installation}. Mine is installed at
+/home/aloo/image-photo-z, so its where it is. Once this is done, just
+run the main on the shell as follows:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{python} \PY{n}{main}\PY{o}{.}\PY{n}{py}
+\end{Verbatim}
+
+    This runs the code with ./config.cfg as the config file. To specify a
+different config file run
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{python} \PY{n}{main}\PY{o}{.}\PY{n}{py} \PY{p}{[}\PY{n}{config}\PY{o}{-}\PY{n+nb}{file}\PY{o}{-}\PY{n}{name}\PY{p}{]}
+\end{Verbatim}
+
+    This \emph{should} get the code running. If you do get any errors at
+this stage, \textbf{do report them}.
+
+\begin{enumerate}[1)]
+\setcounter{enumi}{1}
+\item
+  Using MPI: The file main-mpi.py needs to be run with mpirun in this
+  case. Make sure that the N\_PROCESSORS variable is set to the number
+  of processors you are willing to allocate to the computation in the
+  config file.
+\end{enumerate}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{mpirun} \PY{o}{-}\PY{n}{np} \PY{p}{[}\PY{n}{N\PYZus{}PROCESSORS}\PY{p}{]} \PY{n}{python} \PY{n}{main}\PY{o}{-}\PY{n}{mpi}\PY{o}{.}\PY{n}{py}
+\end{Verbatim}
+
+    To specify a custom config file:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{n}{mpirun} \PY{o}{-}\PY{n}{np} \PY{p}{[}\PY{n}{N\PYZus{}PROCESSORS}\PY{p}{]} \PY{n}{python} \PY{n}{main}\PY{o}{-}\PY{n}{mpi}\PY{o}{.}\PY{n}{py} \PY{p}{[}\PY{n}{config}\PY{o}{-}\PY{n+nb}{file}\PY{o}{-}\PY{n}{name}\PY{p}{]}
+\end{Verbatim}
+
+    The run script in the root folder is already set to run this. To avoid
+the hassle of typing all this, you can run this instead:
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}}]:} \PY{o}{.}\PY{o}{/}\PY{n}{run}
+\end{Verbatim}
+
+    \emph{having made sure} that N\_PROCESSORS is set. This takes config.cfg
+as the config file.
+
+    The code \emph{does not} print anything out on the terminal except for
+the generating training data stage.
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+    \end{document}
